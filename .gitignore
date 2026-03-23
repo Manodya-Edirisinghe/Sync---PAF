@@ -24,8 +24,6 @@ Thumbs.db
 logs/
 
 ## Environment files
-.env
-.env.*
 !.env.example
 !.env.*.example
 
@@ -35,3 +33,4 @@ coverage/
 
 ## Frontend build cache
 ui/.vite/
+config.bat
