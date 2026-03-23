@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: operations_hub_postgres
+    environment:
+      POSTGRES_DB: operations_hub
+      POSTGRES_USER: operations_user
+      POSTGRES_PASSWORD: operations_pass
+    ports:
+      - "5432:5432"
+    volumes:
+      - operations_hub_db:/var/lib/postgresql/data
+
+volumes:
+  operations_hub_db:
