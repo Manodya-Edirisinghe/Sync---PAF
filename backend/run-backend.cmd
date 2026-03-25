@@ -8,4 +8,5 @@ for /f "tokens=5" %%a in ('netstat -ano ^| findstr :8080 ^| findstr LISTENING') 
 )
 
 echo [2/2] Starting Spring Boot...
+set SPRING_PROFILES_ACTIVE=local
 mvn spring-boot:run

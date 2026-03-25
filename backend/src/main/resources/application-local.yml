@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/Sync_pafproject
-    username: campus_user
-    password: sync
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/Sync_pafproject}
+    username: ${DB_USERNAME:campus_user}
+    password: ${DB_PASSWORD:sync}
     driver-class-name: org.postgresql.Driver
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect

@@ -3,6 +3,9 @@
 import { useState, type FormEvent } from "react"
 import { Eye, EyeOff } from "lucide-react"
 
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8080"
+const googleOAuthStartUrl = `${apiBaseUrl.replace(/\/$/, "")}/oauth2/authorization/google`
+
 const GoogleIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -137,6 +140,7 @@ export function DemoPage({ onLoginSuccess }: DemoPageProps) {
                     className="flex w-full gap-2"
                     variant="outline"
                     type="button"
+                    onClick={() => window.location.assign(googleOAuthStartUrl)}
                   >
                     <GoogleIcon className="h-5 w-5 shrink-0" />
                     <span>Login with Google</span>

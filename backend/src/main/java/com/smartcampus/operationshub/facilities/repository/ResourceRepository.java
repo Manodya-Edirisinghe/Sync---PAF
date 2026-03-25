@@ -10,6 +10,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface ResourceRepository extends JpaRepository<Resource, UUID> {
+  boolean existsByName(String name);
+
     List<Resource> findByStatus(ResourceStatus status);
 
     List<Resource> findByType(ResourceType type);
