@@ -9,14 +9,21 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.oauth2.client.web.DefaultOAuth2AuthorizationRequestResolver;
+import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestResolver;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import jakarta.servlet.http.HttpServletRequest;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Configuration
 @EnableWebSecurity
@@ -94,11 +101,45 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()); // For development only - enable CSRF in production
 
         if (oauth2Enabled) {
+            OAuth2AuthorizationRequestResolver resolver = googleAccountChooserRequestResolver(clientRegistrationRepositoryProvider.getIfAvailable());
             http.oauth2Login(oauth2 -> oauth2
+                    .authorizationEndpoint(auth -> auth.authorizationRequestResolver(resolver))
                     .defaultSuccessUrl(frontendUrl, true)
             );
         }
 
         return http.build();
     }
+
+        private OAuth2AuthorizationRequestResolver googleAccountChooserRequestResolver(
+                        ClientRegistrationRepository clientRegistrationRepository
+        ) {
+                DefaultOAuth2AuthorizationRequestResolver defaultResolver =
+                                new DefaultOAuth2AuthorizationRequestResolver(clientRegistrationRepository, "/oauth2/authorization");
+
+                return new OAuth2AuthorizationRequestResolver() {
+                        @Override
+                        public OAuth2AuthorizationRequest resolve(HttpServletRequest request) {
+                                return withAccountChooser(defaultResolver.resolve(request));
+                        }
+
+                        @Override
+                        public OAuth2AuthorizationRequest resolve(HttpServletRequest request, String clientRegistrationId) {
+                                return withAccountChooser(defaultResolver.resolve(request, clientRegistrationId));
+                        }
+
+                        private OAuth2AuthorizationRequest withAccountChooser(OAuth2AuthorizationRequest authRequest) {
+                                if (authRequest == null) {
+                                        return null;
+                                }
+
+                                Map<String, Object> params = new HashMap<>(authRequest.getAdditionalParameters());
+                                params.put("prompt", "select_account");
+
+                                return OAuth2AuthorizationRequest.from(authRequest)
+                                                .additionalParameters(params)
+                                                .build();
+                        }
+                };
+        }
 }
