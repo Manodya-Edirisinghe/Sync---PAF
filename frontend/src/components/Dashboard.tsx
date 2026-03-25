@@ -16,10 +16,21 @@ interface DashboardProps {
   onLogout: () => void;
 }
 
-const signalStyles: Record<string, string> = {
+const signalStyles: Record<"good" | "warn" | "urgent", string> = {
   good: "bg-emerald-100 text-emerald-700 border-emerald-200",
   warn: "bg-amber-100 text-amber-700 border-amber-200",
   urgent: "bg-rose-100 text-rose-700 border-rose-200",
+};
+
+const getKpiSignal = (note: string): "good" | "warn" | "urgent" => {
+  const normalized = note.toLowerCase();
+  if (normalized.includes("critical") || normalized.includes("incident")) {
+    return "urgent";
+  }
+  if (normalized.includes("await") || normalized.includes("pending")) {
+    return "warn";
+  }
+  return "good";
 };
 
 export function Dashboard({ onLogout }: DashboardProps) {
@@ -75,30 +86,33 @@ export function Dashboard({ onLogout }: DashboardProps) {
         {/* Campus Overview */}
         <section className="space-y-6">
           <div className="space-y-2">
-            <h1 className="text-3xl font-bold text-ink-900">{campus.name}</h1>
-            <p className="text-ink-600">{campus.statusMessage}</p>
+            <h1 className="text-3xl font-bold text-ink-900">{campus}</h1>
+            <p className="text-ink-600">Campus operations are live and monitored in real time.</p>
           </div>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
-            {Object.entries(kpis).map(([key, value]) => (
-              <Card key={key} className="overflow-hidden border-ink-200">
+            {kpis.map((value) => {
+              const signal = getKpiSignal(value.note);
+              return (
+              <Card key={value.label} className="overflow-hidden border-ink-200">
                 <CardContent className="p-4">
-                  <div className="text-2xl font-bold text-ink-900">{value.current}</div>
+                  <div className="text-2xl font-bold text-ink-900">{value.value}</div>
                   <div className="flex items-center justify-between pt-2">
-                    <span className="text-xs text-ink-500 font-medium">{value.name}</span>
+                    <span className="text-xs text-ink-500 font-medium">{value.label}</span>
                     <Badge
-                      className={`text-xs ${signalStyles[value.status]}`}
+                      className={`text-xs ${signalStyles[signal]}`}
                       variant="outline"
                     >
-                      {value.status === "good"
+                      {signal === "good"
                         ? "↑"
-                        : value.status === "warn"
+                        : signal === "warn"
                           ? "→"
                           : "↓"}
                     </Badge>
                   </div>
+                  <p className="pt-2 text-xs text-ink-500">{value.note}</p>
                 </CardContent>
               </Card>
-            ))}
+            )})}
           </div>
         </section>
 
@@ -111,32 +125,24 @@ export function Dashboard({ onLogout }: DashboardProps) {
             </span>
           </div>
           <div className="grid gap-4 md:grid-cols-2">
-            {modules.facilities &&
-              Object.entries(modules.facilities).map(([zone, data]) => (
-                <Card key={zone} className="border-ink-200">
+            {modules.map((module) => (
+                <Card key={module.title} className="border-ink-200">
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
-                      <h3 className="font-semibold text-ink-900">{zone}</h3>
+                      <h3 className="font-semibold text-ink-900">{module.title}</h3>
                       <Badge
-                        className={`text-xs ${signalStyles[data.signal]}`}
+                        className={`text-xs ${signalStyles[module.signal]}`}
                         variant="outline"
                       >
-                        {data.signal}
+                        {module.signal}
                       </Badge>
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-3">
+                    <p className="text-sm text-ink-600">{module.summary}</p>
                     <div className="flex justify-between text-sm">
-                      <span className="text-ink-600">Capacity</span>
-                      <span className="font-semibold text-ink-900">{data.capacity}</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-ink-600">Occupancy</span>
-                      <span className="font-semibold text-ink-900">{data.occupancy}</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-ink-600">Uptime</span>
-                      <span className="font-semibold text-ink-900">{data.uptime}</span>
+                      <span className="text-ink-600">Status</span>
+                      <span className="font-semibold text-ink-900">{module.status}</span>
                     </div>
                   </CardContent>
                 </Card>
