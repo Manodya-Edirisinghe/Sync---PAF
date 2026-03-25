@@ -14,8 +14,8 @@
     <groupId>com.smartcampus</groupId>
     <artifactId>operations-hub</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>Smart Campus Operations Hub</name>
-    <description>Smart Campus Operations Hub</description>
+    <name>Sync</name>
+    <description>Sync</description>
 
     <properties>
         <java.version>21</java.version>

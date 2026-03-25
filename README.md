@@ -1,6 +1,6 @@
-# Smart Campus Operations Hub
+# Sync
 
-Smart Campus Operations Hub is a full-stack project for managing campus operations such as bookings, facilities, incidents, and users.
+Sync is a full-stack project for managing campus operations such as bookings, facilities, incidents, and users.
 
 ## Tech Stack
 

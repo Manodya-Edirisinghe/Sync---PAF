@@ -1,6 +1,6 @@
 # Frontend (UI)
 
-React + TypeScript + Vite client for Smart Campus Operations Hub.
+React + TypeScript + Vite client for Sync.
 
 ## Scripts
 
