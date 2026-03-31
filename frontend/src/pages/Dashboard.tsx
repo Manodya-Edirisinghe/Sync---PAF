@@ -119,15 +119,15 @@ function ProfileDropdown({ user, logout, roleCfg, joinedDate }: ProfileDropdownP
         <div className="absolute right-0 mt-4 w-80 rounded-2xl border border-white/10 bg-[#0c0c0c] shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden z-50 animate-in fade-in slide-in-from-top-4 duration-300 backdrop-blur-2xl">
           <div className="p-6 border-b border-white/5 bg-gradient-to-br from-white/5 to-transparent">
             <p className="font-extrabold text-white truncate text-lg tracking-tight uppercase">{user.displayName}</p>
-            <p className="text-xs text-white/40 truncate font-medium mt-1">{user.email}</p>
+            <p className="text-xs text-white/60 truncate font-medium mt-1">{user.email}</p>
           </div>
           <div className="p-4 space-y-4">
             <div className="flex items-center justify-between px-2">
-               <span className="text-xs font-bold text-white/30 uppercase tracking-widest">Access Tier</span>
+               <span className="text-xs font-bold text-white/50 uppercase tracking-widest">Access Tier</span>
                <span className={`text-[10px] px-3 py-1 rounded-full font-black tracking-widest uppercase ${roleCfg.bg} ${roleCfg.color} border ${roleCfg.border}`}>{roleCfg.label}</span>
             </div>
             <div className="flex items-center justify-between px-2">
-               <span className="text-xs font-bold text-white/30 uppercase tracking-widest">Member Since</span>
+               <span className="text-xs font-bold text-white/50 uppercase tracking-widest">Member Since</span>
                <span className="text-sm font-bold text-white/80">{joinedDate}</span>
             </div>
           </div>
@@ -204,7 +204,7 @@ export default function Dashboard() {
           </div>
           <div className="flex flex-col">
             <span className="text-lg font-black tracking-tight text-white leading-none uppercase">Smart Campus</span>
-            <span className="text-[10px] font-bold text-white/30 uppercase tracking-[0.3em] mt-1.5">Operations Hub</span>
+            <span className="text-[10px] font-bold text-white/50 uppercase tracking-[0.3em] mt-1.5">Operations Hub</span>
           </div>
         </div>
 
@@ -221,7 +221,7 @@ export default function Dashboard() {
 
           <div className="h-8 w-px bg-white/10" />
 
-          <button className="rounded-full p-2.5 text-white/30 hover:bg-white/10 hover:text-white transition-all relative group">
+          <button className="rounded-full p-2.5 text-white/50 hover:bg-white/10 hover:text-white transition-all relative group">
             <Bell className="h-6 w-6 group-hover:rotate-12 transition-transform" />
             <span className="absolute top-2.5 right-2.5 h-2.5 w-2.5 rounded-full bg-red-500 border-2 border-[#030303] shadow-[0_0_10px_rgba(239,68,68,0.5)]" />
           </button>
@@ -251,7 +251,7 @@ export default function Dashboard() {
               <h1 className="text-5xl lg:text-7xl font-black text-white tracking-tighter leading-[0.9]">
                 Ready for business, <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-white to-purple-400">{user.displayName.split(" ")[0]}?</span>
               </h1>
-              <p className="text-xl text-white/40 max-w-lg leading-relaxed font-medium">
+              <p className="text-xl text-white/60 max-w-lg leading-relaxed font-medium">
                 Monitor campus operations, manage key facilities, and handle incidents through your unified operations hub.
               </p>
             </div>
@@ -274,12 +274,12 @@ export default function Dashboard() {
               key={label}
               className="group rounded-3xl border border-white/5 bg-white/[0.02] p-8 space-y-4 hover:bg-white/[0.05] hover:border-white/10 transition-all duration-300"
             >
-              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30">{label}</p>
+              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/50">{label}</p>
               <div className="flex items-baseline gap-2">
                 <p className={`text-4xl font-black tracking-tighter ${color}`}>{value}</p>
-                {label === "Bookings" && <ArrowUpRight className="h-4 w-4 text-white/20 group-hover:text-white/40 transition-colors" />}
+                {label === "Bookings" && <ArrowUpRight className="h-4 w-4 text-white/40 group-hover:text-white/60 transition-colors" />}
               </div>
-              <p className="text-[10px] font-bold text-white/20 uppercase tracking-widest">{sub}</p>
+              <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest">{sub}</p>
             </div>
           ))}
         </div>
@@ -287,7 +287,7 @@ export default function Dashboard() {
         {/* Quick actions */}
         <section className="space-y-8">
           <div className="flex items-center gap-6">
-            <h2 className="text-[10px] font-black uppercase tracking-[0.5em] text-white/20 whitespace-nowrap">
+            <h2 className="text-[10px] font-black uppercase tracking-[0.5em] text-white/40 whitespace-nowrap">
               Operations Control
             </h2>
             <div className="h-[1px] bg-white/[0.05] flex-1" />
@@ -307,7 +307,7 @@ export default function Dashboard() {
                 
                 <div className="relative min-w-0 flex-1">
                   <p className="font-black text-white text-2xl mb-2 tracking-tight uppercase leading-none">{label}</p>
-                  <p className="text-base text-white/30 font-medium group-hover:text-white/60 transition-colors">{description}</p>
+                  <p className="text-base text-white/50 font-medium group-hover:text-white/60 transition-colors">{description}</p>
                 </div>
                 
                 <div className="relative flex h-12 w-12 items-center justify-center rounded-full bg-white/5 border border-white/10 opacity-0 group-hover:opacity-100 transition-all duration-500 -translate-x-4 group-hover:translate-x-0">
