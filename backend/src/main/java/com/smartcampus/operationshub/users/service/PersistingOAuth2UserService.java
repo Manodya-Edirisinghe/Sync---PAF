@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -44,12 +45,16 @@ public class PersistingOAuth2UserService implements OAuth2UserService<OAuth2User
     private final UserRepository userRepository;
     private final NotificationRepository notificationRepository;
     private final DefaultOAuth2UserService delegate;
+    private final String ownerEmail;
 
-    public PersistingOAuth2UserService(UserRepository userRepository, NotificationRepository notificationRepository) {
+    public PersistingOAuth2UserService(UserRepository userRepository, 
+                                      NotificationRepository notificationRepository,
+                                      @Value("${app.owner-email}") String ownerEmail) {
         this.userRepository = userRepository;
         this.notificationRepository = notificationRepository;
         this.delegate = new DefaultOAuth2UserService();
-        log.info("### PersistingOAuth2UserService INSTANTIATED ###");
+        this.ownerEmail = ownerEmail;
+        log.info("### PersistingOAuth2UserService INSTANTIATED (owner: {}) ###", ownerEmail);
     }
 
     @Override
@@ -107,6 +112,13 @@ public class PersistingOAuth2UserService implements OAuth2UserService<OAuth2User
             if (user.getRoles().isEmpty()) {
                 user.getRoles().add(Role.USER);
                 log.info("Assigned default USER role to new user");
+            }
+
+            // --- Apply Protection for Owner ---
+            if (email.equalsIgnoreCase(ownerEmail)) {
+                user.setAdminProtected(true);
+                // Also ensure owner is always an admin
+                user.getRoles().add(Role.ADMIN);
             }
 
             User savedUser = userRepository.save(user);

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, ElementType } from "react"
 import { useNavigate } from "react-router-dom"
 import { useAuth } from "@/context/AuthContext"
 import {
@@ -16,16 +16,18 @@ import {
   Clock,
   CheckCircle2,
   Trash2,
-  BellRing
+  BellRing,
+  Lock
 } from "lucide-react"
 
 // --- Types ---
 interface User {
-  id: number
+  id: string | number
   displayName: string
   email: string
   avatarUrl?: string
   roles: string[]
+  adminProtected?: boolean
   createdAt?: string
 }
 
@@ -42,7 +44,7 @@ interface Notification {
 // --- Components ---
 
 interface NavItemProps {
-  icon: any;
+  icon: ElementType;
   label: string;
   active: boolean;
   onClick: () => void;
@@ -88,7 +90,7 @@ function UserManagement() {
     }
   }
 
-  const toggleRole = async (userId: number, currentRoles: string[]) => {
+  const toggleRole = async (userId: number | string, currentRoles: string[]) => {
     const newRoles = currentRoles.includes("ADMIN") ? ["USER"] : ["USER", "ADMIN"]
     try {
       const res = await fetch(`${API_BASE_URL}/api/admin/users/${userId}/roles`, {
@@ -159,7 +161,14 @@ function UserManagement() {
                       {u.avatarUrl ? <img src={u.avatarUrl} className="h-full w-full object-cover" /> : <Users className="h-6 w-6 text-indigo-400" />}
                     </div>
                     <div>
-                      <p className="font-extrabold text-lg text-white tracking-tight uppercase leading-none">{u.displayName}</p>
+                      <div className="flex items-center gap-2">
+                        <p className="font-extrabold text-lg text-white tracking-tight uppercase leading-none">{u.displayName}</p>
+                        {u.adminProtected && (
+                          <span title="Protected Account" className="text-amber-500">
+                            <Lock className="w-3.5 h-3.5" />
+                          </span>
+                        )}
+                      </div>
                       <p className="text-xs text-white/50 mt-1.5 font-medium">{u.email}</p>
                     </div>
                   </div>
@@ -182,10 +191,13 @@ function UserManagement() {
                   <div className="flex items-center justify-end gap-3">
                     <button 
                       onClick={() => toggleRole(u.id, u.roles)}
+                      disabled={u.adminProtected}
                       className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border ${
-                        u.roles.includes('ADMIN')
-                          ? 'border-red-500/20 text-red-400 hover:bg-red-500/10'
-                          : 'border-indigo-500/20 text-indigo-400 hover:bg-indigo-500/10'
+                        u.adminProtected
+                          ? 'border-white/10 text-white/20 cursor-not-allowed'
+                          : u.roles.includes('ADMIN')
+                            ? 'border-red-500/20 text-red-400 hover:bg-red-500/10'
+                            : 'border-indigo-500/20 text-indigo-400 hover:bg-indigo-500/10'
                       }`}
                     >
                       {u.roles.includes('ADMIN') ? 'Revoke Admin' : 'Grant Admin'}
@@ -311,7 +323,7 @@ function NotificationsCenter() {
 interface PlaceholderTabProps {
   title: string;
   description: string;
-  icon: any;
+  icon: ElementType;
 }
 
 function PlaceholderTab({ title, description, icon: Icon }: PlaceholderTabProps) {
@@ -362,7 +374,7 @@ export default function AdminDashboard() {
         </div>
         <h1 className="text-5xl font-black tracking-tighter uppercase text-center">Access Restricted</h1>
         <p className="max-w-md text-center text-white/50 font-medium text-lg leading-relaxed">Identity verification indicates missing administrative privileges for this secure zone.</p>
-        <button onClick={() => navigate("/dashboard")} className="bg-white text-black font-black uppercase tracking-[.2em] px-12 py-5 rounded-full hover:scale-105 active:scale-95 transition-all text-xs">Return to Base</button>
+        <button onClick={() => navigate("/dashboard")} className="bg-white text-black font-black uppercase tracking-[.2em] px-12 py-5 rounded-full hover:scale-105 active:scale-95 transition-all text-xs">Return to User Dashboard</button>
       </div>
     )
   }
@@ -436,7 +448,7 @@ export default function AdminDashboard() {
                 className="flex items-center gap-3 px-6 py-3 rounded-2xl bg-white/[0.03] border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all text-white group"
               >
                  <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" />
-                 <span className="text-xs font-black uppercase tracking-widest">Return to Base Dashboard</span>
+                 <span className="text-xs font-black uppercase tracking-widest">Return to User Dashboard</span>
               </button>
 
               <div className="h-8 w-px bg-white/5" />

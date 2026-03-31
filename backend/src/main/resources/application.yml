@@ -39,3 +39,4 @@ logging:
 
 app:
   frontend-url: ${APP_FRONTEND_URL:http://localhost:5173}
+  owner-email: ${APP_OWNER_EMAIL:llithira3@gmail.com}

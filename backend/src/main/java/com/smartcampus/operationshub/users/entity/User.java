@@ -43,6 +43,8 @@ public class User {
     private String oauthSubject;
 
     private boolean notificationsEnabled = true;
+    
+    private boolean adminProtected = false;
 
     @Column
     private String avatarUrl;
@@ -121,6 +123,14 @@ public class User {
 
     public void setAvatarUrl(String avatarUrl) {
         this.avatarUrl = avatarUrl;
+    }
+
+    public boolean isAdminProtected() {
+        return adminProtected;
+    }
+
+    public void setAdminProtected(boolean adminProtected) {
+        this.adminProtected = adminProtected;
     }
 
     public Set<Role> getRoles() {

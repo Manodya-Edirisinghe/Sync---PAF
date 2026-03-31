@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -44,11 +45,15 @@ public class PersistingOidcUserService extends OidcUserService {
 
     private final UserRepository userRepository;
     private final NotificationRepository notificationRepository;
+    private final String ownerEmail;
 
-    public PersistingOidcUserService(UserRepository userRepository, NotificationRepository notificationRepository) {
+    public PersistingOidcUserService(UserRepository userRepository, 
+                                    NotificationRepository notificationRepository,
+                                    @Value("${app.owner-email}") String ownerEmail) {
         this.userRepository = userRepository;
         this.notificationRepository = notificationRepository;
-        log.info("### PersistingOidcUserService INSTANTIATED ###");
+        this.ownerEmail = ownerEmail;
+        log.info("### PersistingOidcUserService INSTANTIATED (owner: {}) ###", ownerEmail);
     }
 
     @Override
@@ -106,6 +111,13 @@ public class PersistingOidcUserService extends OidcUserService {
             if (user.getRoles().isEmpty()) {
                 user.getRoles().add(Role.USER);
                 log.info("Assigned default USER role to new user");
+            }
+
+            // --- Apply Protection for Owner ---
+            if (email.equalsIgnoreCase(ownerEmail)) {
+                user.setAdminProtected(true);
+                // Also ensure owner is always an admin
+                user.getRoles().add(Role.ADMIN);
             }
 
             User savedUser = userRepository.save(user);

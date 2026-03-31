@@ -76,6 +76,10 @@ public class UserController {
     @PutMapping("/admin/users/{id}/roles")
     public ResponseEntity<?> updateRoles(@PathVariable UUID id, @RequestBody List<String> roleNames) {
         return userRepository.findById(id).map(user -> {
+            if (user.isAdminProtected() && !roleNames.contains("ADMIN")) {
+                return ResponseEntity.status(403).body(Map.of("error", "This administrative account is protected and cannot be revoked."));
+            }
+
             Set<Role> newRoles = roleNames.stream()
                     .map(name -> {
                         try {
@@ -129,12 +133,13 @@ public class UserController {
                 .map(Enum::name)
                 .collect(Collectors.toSet());
         return Map.of(
-                "id",          user.getId().toString(),
-                "email",       user.getEmail(),
-                "displayName", user.getDisplayName(),
-                "avatarUrl",   user.getAvatarUrl() != null ? user.getAvatarUrl() : "",
-                "roles",       roleNames,
-                "createdAt",   user.getCreatedAt() != null ? user.getCreatedAt().toString() : ""
+                "id",             user.getId().toString(),
+                "email",          user.getEmail(),
+                "displayName",    user.getDisplayName(),
+                "avatarUrl",      user.getAvatarUrl() != null ? user.getAvatarUrl() : "",
+                "roles",          roleNames,
+                "adminProtected", user.isAdminProtected(),
+                "createdAt",      user.getCreatedAt() != null ? user.getCreatedAt().toString() : ""
         );
     }
 }
