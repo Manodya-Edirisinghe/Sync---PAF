@@ -63,17 +63,10 @@ export function DemoPage({ onLoginSuccess }: DemoPageProps) {
     <div className="dark grid min-h-svh lg:grid-cols-2 text-foreground">
       {/* Left panel — dark background via CSS variables */}
       <div className="bg-background flex flex-col gap-4 p-6 md:p-10">
-        {/* Logo */}
-        <div className="flex justify-center gap-2 md:justify-start">
-          <a href="#" aria-label="home" className="flex items-center gap-2">
-            <img
-              src="https://raw.githubusercontent.com/aliimam-in/aliimam/refs/heads/main/apps/www/public/brand/ai-logo-white.png"
-              alt="Brand"
-              height={50}
-              width={50}
-              className="z-10 h-10 w-auto object-contain"
-            />
-          </a>
+        <div className="flex justify-center md:justify-start">
+          <h2 className="text-lg font-semibold tracking-wide text-foreground">
+            Smart Campus Operations Hub
+          </h2>
         </div>
 
         {/* Centered form */}
