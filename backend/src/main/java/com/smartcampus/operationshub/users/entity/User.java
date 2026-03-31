@@ -44,6 +44,7 @@ public class User {
 
     private boolean notificationsEnabled = true;
     
+    @Column(name = "admin_protected", nullable = false)
     private boolean adminProtected = false;
 
     @Column
