@@ -15,21 +15,21 @@ interface AuthContextValue {
   user: AuthUser | null
   isLoading: boolean
   logout: () => Promise<void>
-  refetch: () => Promise<void>
+  refetch: () => Promise<AuthUser | null>
 }
 
 const AuthContext = createContext<AuthContextValue>({
   user: null,
   isLoading: true,
   logout: async () => {},
-  refetch: async () => {},
+  refetch: async () => null,
 })
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
-  const fetchUser = async () => {
+  const fetchUser = async (): Promise<AuthUser | null> => {
     try {
       const res = await fetch(`${API_BASE}/api/me`, {
         credentials: "include",
@@ -37,11 +37,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (res.ok) {
         const data = await res.json()
         setUser(data)
+        return data
       } else {
         setUser(null)
+        return null
       }
     } catch {
       setUser(null)
+      return null
     } finally {
       setIsLoading(false)
     }

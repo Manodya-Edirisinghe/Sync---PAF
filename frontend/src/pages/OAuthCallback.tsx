@@ -21,8 +21,12 @@ export default function OAuthCallback() {
     if (called.current) return
     called.current = true
 
-    refetch().then(() => {
-      navigate("/dashboard", { replace: true })
+    refetch().then((user) => {
+      if (user && user.roles.includes("ADMIN")) {
+        navigate("/admin", { replace: true })
+      } else {
+        navigate("/dashboard", { replace: true })
+      }
     })
   }, [refetch, navigate])
 

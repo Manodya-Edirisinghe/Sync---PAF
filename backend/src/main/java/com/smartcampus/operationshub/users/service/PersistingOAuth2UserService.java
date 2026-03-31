@@ -1,5 +1,7 @@
 package com.smartcampus.operationshub.users.service;
 
+import com.smartcampus.operationshub.common.entity.Notification;
+import com.smartcampus.operationshub.common.repository.NotificationRepository;
 import com.smartcampus.operationshub.users.entity.Role;
 import com.smartcampus.operationshub.users.entity.User;
 import com.smartcampus.operationshub.users.repository.UserRepository;
@@ -40,10 +42,12 @@ public class PersistingOAuth2UserService implements OAuth2UserService<OAuth2User
     private static final Logger log = LoggerFactory.getLogger(PersistingOAuth2UserService.class);
 
     private final UserRepository userRepository;
+    private final NotificationRepository notificationRepository;
     private final DefaultOAuth2UserService delegate;
 
-    public PersistingOAuth2UserService(UserRepository userRepository) {
+    public PersistingOAuth2UserService(UserRepository userRepository, NotificationRepository notificationRepository) {
         this.userRepository = userRepository;
+        this.notificationRepository = notificationRepository;
         this.delegate = new DefaultOAuth2UserService();
         log.info("### PersistingOAuth2UserService INSTANTIATED ###");
     }
@@ -108,6 +112,15 @@ public class PersistingOAuth2UserService implements OAuth2UserService<OAuth2User
             User savedUser = userRepository.save(user);
             log.info("✓ User persisted: id={}, email={}, roles={}, isNew={}",
                      savedUser.getId(), savedUser.getEmail(), savedUser.getRoles(), isNewUser);
+
+            if (isNewUser) {
+                notificationRepository.save(Notification.builder()
+                        .message("New user registered: " + savedUser.getEmail())
+                        .type("USER_REGISTRATION")
+                        .isRead(false)
+                        .build());
+                log.info("🔔 Notification created for new user registration");
+            }
 
             // --- Build authorities from DB roles ---
             Set<GrantedAuthority> authorities = savedUser.getRoles().stream()

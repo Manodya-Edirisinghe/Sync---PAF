@@ -13,8 +13,14 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.CurrentSecurityContext;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import com.smartcampus.operationshub.users.entity.Role;
+import java.util.UUID;
+
 
 @RestController
 @RequestMapping("/api")
@@ -50,6 +56,7 @@ public class UserController {
                 .orElse(ResponseEntity.status(404).body(Map.of("error", "User not found in database")));
     }
 
+
     /**
      * Admin-only: list all registered users.
      */
@@ -61,6 +68,35 @@ public class UserController {
                 .collect(Collectors.toList());
         return ResponseEntity.ok(users);
     }
+
+    /**
+     * Admin-only: update roles for a specific user.
+     * Expects a JSON array of role names, e.g., ["ADMIN", "USER"]
+     */
+    @PutMapping("/admin/users/{id}/roles")
+    public ResponseEntity<?> updateRoles(@PathVariable UUID id, @RequestBody List<String> roleNames) {
+        return userRepository.findById(id).map(user -> {
+            Set<Role> newRoles = roleNames.stream()
+                    .map(name -> {
+                        try {
+                            return Role.valueOf(name.toUpperCase());
+                        } catch (IllegalArgumentException e) {
+                            return null;
+                        }
+                    })
+                    .filter(role -> role != null)
+                    .collect(Collectors.toSet());
+            
+            // Ensure the user always retains the base USER role as a safeguard
+            newRoles.add(Role.USER);
+            
+            user.setRoles(newRoles);
+            User updatedUser = userRepository.save(user);
+            System.out.println("### UPDATED ROLES for " + user.getEmail() + " to " + newRoles + " ###");
+            return ResponseEntity.ok(toDto(updatedUser));
+        }).orElse(ResponseEntity.status(404).body(Map.of("error", "User not found")));
+    }
+
 
     // -------------------------------------------------------------------------
     // Helpers

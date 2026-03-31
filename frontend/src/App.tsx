@@ -3,6 +3,7 @@ import { AuthProvider } from "@/context/AuthContext"
 import { LoginPage } from "@/components/LoginPage"
 import { ProtectedRoute } from "@/components/ProtectedRoute"
 import Dashboard from "@/pages/Dashboard"
+import AdminDashboard from "@/pages/AdminDashboard"
 import OAuthCallback from "@/pages/OAuthCallback"
 
 function App() {
@@ -22,6 +23,16 @@ function App() {
             element={
               <ProtectedRoute>
                 <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          
+          {/* Admin routes */}
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute requiredRole="ADMIN">
+                <AdminDashboard />
               </ProtectedRoute>
             }
           />

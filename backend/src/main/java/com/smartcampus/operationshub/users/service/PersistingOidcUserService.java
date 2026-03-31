@@ -1,5 +1,7 @@
 package com.smartcampus.operationshub.users.service;
 
+import com.smartcampus.operationshub.common.entity.Notification;
+import com.smartcampus.operationshub.common.repository.NotificationRepository;
 import com.smartcampus.operationshub.users.entity.Role;
 import com.smartcampus.operationshub.users.entity.User;
 import com.smartcampus.operationshub.users.repository.UserRepository;
@@ -41,9 +43,11 @@ public class PersistingOidcUserService extends OidcUserService {
     private static final Logger log = LoggerFactory.getLogger(PersistingOidcUserService.class);
 
     private final UserRepository userRepository;
+    private final NotificationRepository notificationRepository;
 
-    public PersistingOidcUserService(UserRepository userRepository) {
+    public PersistingOidcUserService(UserRepository userRepository, NotificationRepository notificationRepository) {
         this.userRepository = userRepository;
+        this.notificationRepository = notificationRepository;
         log.info("### PersistingOidcUserService INSTANTIATED ###");
     }
 
@@ -107,6 +111,15 @@ public class PersistingOidcUserService extends OidcUserService {
             User savedUser = userRepository.save(user);
             log.info("✓ User persisted: id={}, email={}, roles={}, isNew={}",
                      savedUser.getId(), savedUser.getEmail(), savedUser.getRoles(), isNewUser);
+
+            if (isNewUser) {
+                notificationRepository.save(Notification.builder()
+                        .message("New user registered: " + savedUser.getEmail())
+                        .type("USER_REGISTRATION")
+                        .isRead(false)
+                        .build());
+                log.info("🔔 Notification created for new user registration (OIDC)");
+            }
 
             // --- Build authorities from DB roles ---
             Set<GrantedAuthority> authorities = savedUser.getRoles().stream()
