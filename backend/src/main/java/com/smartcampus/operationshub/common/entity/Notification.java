@@ -29,8 +29,8 @@ public class Notification {
     private LocalDateTime createdAt;
 
     @Builder.Default
-    @Column(nullable = false)
-    private boolean isRead = false;
+    @Column(name = "is_read", nullable = false)
+    private boolean read = false;
 
     @PrePersist
     protected void onCreate() {

@@ -116,7 +116,7 @@ public class PersistingOidcUserService extends OidcUserService {
                 notificationRepository.save(Notification.builder()
                         .message("New user registered: " + savedUser.getEmail())
                         .type("USER_REGISTRATION")
-                        .isRead(false)
+                        .read(false)
                         .build());
                 log.info("🔔 Notification created for new user registration (OIDC)");
             }
