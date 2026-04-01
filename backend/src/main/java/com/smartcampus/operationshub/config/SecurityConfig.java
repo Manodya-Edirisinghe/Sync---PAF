@@ -87,7 +87,8 @@ public class SecurityConfig {
             ObjectProvider<ClientRegistrationRepository> clientRegistrationRepositoryProvider,
             PersistingOAuth2UserService persistingOAuth2UserService,
             PersistingOidcUserService persistingOidcUserService,
-            OAuthSuccessHandler oauthSuccessHandler
+            OAuthSuccessHandler oauthSuccessHandler,
+            HttpCookieOAuth2AuthorizationRequestRepository cookieAuthorizationRequestRepository
     ) throws Exception {
         boolean oauth2Enabled = clientRegistrationRepositoryProvider.getIfAvailable() != null;
 
@@ -127,7 +128,10 @@ public class SecurityConfig {
             log.info("### Configuring OAuth2 login with custom PersistingOAuth2UserService ###");
             OAuth2AuthorizationRequestResolver resolver = googleAccountChooserRequestResolver(clientRegistrationRepositoryProvider.getIfAvailable());
             http.oauth2Login(oauth2 -> {
-                oauth2.authorizationEndpoint(auth -> auth.authorizationRequestResolver(resolver));
+                oauth2.authorizationEndpoint(auth -> {
+                    auth.authorizationRequestResolver(resolver);
+                    auth.authorizationRequestRepository(cookieAuthorizationRequestRepository);
+                });
                 oauth2.userInfoEndpoint(userInfo -> {
                     userInfo.userService(persistingOAuth2UserService);
                     userInfo.oidcUserService(persistingOidcUserService);

@@ -16,8 +16,14 @@ public class OAuthSuccessHandler implements AuthenticationSuccessHandler {
 
     private static final Logger log = LoggerFactory.getLogger(OAuthSuccessHandler.class);
 
+    private final HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
+
     @Value("${app.frontend-url:http://localhost:5173}")
     private String frontendUrl;
+
+    public OAuthSuccessHandler(HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository) {
+        this.httpCookieOAuth2AuthorizationRequestRepository = httpCookieOAuth2AuthorizationRequestRepository;
+    }
 
     @Override
     public void onAuthenticationSuccess(
@@ -27,6 +33,10 @@ public class OAuthSuccessHandler implements AuthenticationSuccessHandler {
     ) throws IOException, ServletException {
         log.info("Authentication SUCCESS. Principal: {}", authentication.getPrincipal());
         log.info("Authorities: {}", authentication.getAuthorities());
+        
+        // Clear cookies
+        httpCookieOAuth2AuthorizationRequestRepository.removeAuthorizationRequestCookies(request, response);
+
         String dashboardUrl = frontendUrl.replaceAll("/$", "") + "/oauth2/callback";
         log.info("Redirecting to dashboard: {}", dashboardUrl);
         response.sendRedirect(dashboardUrl);
