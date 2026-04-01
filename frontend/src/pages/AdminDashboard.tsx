@@ -82,9 +82,12 @@ function UserManagement() {
   const fetchUsers = async () => {
     try {
       const res = await fetch(`${API_BASE_URL}/api/admin/users`, { credentials: "include" })
-      if (res.ok) setUsers(await res.json())
-    } catch (err) {
-      console.error("Fetch users failed:", err)
+      if (res.ok) {
+        const data = await res.json() as User[];
+        setUsers(data);
+      }
+    } catch (err: unknown) {
+      console.error("Fetch users failed:", err instanceof Error ? err.message : String(err))
     } finally {
       setLoading(false)
     }
@@ -100,8 +103,8 @@ function UserManagement() {
         credentials: "include"
       })
       if (res.ok) fetchUsers()
-    } catch (err) {
-      console.error("Update role failed:", err)
+    } catch (err: unknown) {
+      console.error("Update role failed:", err instanceof Error ? err.message : String(err))
     }
   }
 
@@ -223,9 +226,12 @@ function NotificationsCenter() {
   const fetchNotifications = async () => {
     try {
       const res = await fetch(`${API_BASE_URL}/api/notifications`, { credentials: "include" })
-      if (res.ok) setNotifications(await res.json())
-    } catch (err) {
-      console.error("Fetch notifications failed:", err)
+      if (res.ok) {
+        const data = await res.json() as Notification[];
+        setNotifications(data);
+      }
+    } catch (err: unknown) {
+      console.error("Fetch notifications failed:", err instanceof Error ? err.message : String(err))
     } finally {
       setLoading(false)
     }
@@ -238,8 +244,8 @@ function NotificationsCenter() {
         credentials: "include"
       })
       if (res.ok) fetchNotifications()
-    } catch (err) {
-      console.error("Mark as read failed:", err)
+    } catch (err: unknown) {
+      console.error("Mark as read failed:", err instanceof Error ? err.message : String(err))
     }
   }
 
@@ -250,8 +256,8 @@ function NotificationsCenter() {
         credentials: "include"
       })
       if (res.ok) fetchNotifications()
-    } catch (err) {
-      console.error("Delete notification failed:", err)
+    } catch (err: unknown) {
+      console.error("Delete notification failed:", err instanceof Error ? err.message : String(err))
     }
   }
 
@@ -358,9 +364,12 @@ export default function AdminDashboard() {
     const fetchStats = async () => {
       try {
         const res = await fetch(`${API_BASE_URL}/api/stats/admin`, { credentials: "include" })
-        if (res.ok) setStats(await res.json())
-      } catch (err) {
-        console.error("Fetch admin stats failed:", err)
+        if (res.ok) {
+          const data = await res.json() as typeof stats;
+          setStats(data);
+        }
+      } catch (err: unknown) {
+        console.error("Fetch admin stats failed:", err instanceof Error ? err.message : String(err))
       }
     }
     fetchStats()
