@@ -1,0 +1,57 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] -------------------< com.smartcampus:operations-hub >-------------------
+[INFO] Building Sync 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ operations-hub ---
+[INFO] Copying 2 resources from src\main\resources to target\classes
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ operations-hub ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 32 source files with javac [debug parameters release 21] to target\classes
+[INFO] -------------------------------------------------------------
+[ERROR] COMPILATION ERROR : 
+[INFO] -------------------------------------------------------------
+[ERROR] /C:/Users/llith/OneDrive/Desktop/Sync/backend/src/main/java/com/smartcampus/operationshub/common/controller/DashboardStatsController.java:[26,24] cannot find symbol
+  symbol:   method builder()
+  location: class com.smartcampus.operationshub.common.dto.StatsDTO
+[ERROR] /C:/Users/llith/OneDrive/Desktop/Sync/backend/src/main/java/com/smartcampus/operationshub/common/controller/NotificationController.java:[28,14] cannot find symbol
+  symbol:   method setRead(boolean)
+  location: variable n of type com.smartcampus.operationshub.common.entity.Notification
+[ERROR] /C:/Users/llith/OneDrive/Desktop/Sync/backend/src/main/java/com/smartcampus/operationshub/users/service/PersistingOAuth2UserService.java:[130,52] cannot find symbol
+  symbol:   method builder()
+  location: class com.smartcampus.operationshub.common.entity.Notification
+[ERROR] /C:/Users/llith/OneDrive/Desktop/Sync/backend/src/main/java/com/smartcampus/operationshub/users/service/PersistingOidcUserService.java:[129,52] cannot find symbol
+  symbol:   method builder()
+  location: class com.smartcampus.operationshub.common.entity.Notification
+[INFO] 4 errors 
+[INFO] -------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  2.534 s
+[INFO] Finished at: 2026-04-01T22:12:23+05:30
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.13.0:compile (default-compile) on project operations-hub: Compilation failure: Compilation failure: 
+[ERROR] /C:/Users/llith/OneDrive/Desktop/Sync/backend/src/main/java/com/smartcampus/operationshub/common/controller/DashboardStatsController.java:[26,24] cannot find symbol
+[ERROR]   symbol:   method builder()
+[ERROR]   location: class com.smartcampus.operationshub.common.dto.StatsDTO
+[ERROR] /C:/Users/llith/OneDrive/Desktop/Sync/backend/src/main/java/com/smartcampus/operationshub/common/controller/NotificationController.java:[28,14] cannot find symbol
+[ERROR]   symbol:   method setRead(boolean)
+[ERROR]   location: variable n of type com.smartcampus.operationshub.common.entity.Notification
+[ERROR] /C:/Users/llith/OneDrive/Desktop/Sync/backend/src/main/java/com/smartcampus/operationshub/users/service/PersistingOAuth2UserService.java:[130,52] cannot find symbol
+[ERROR]   symbol:   method builder()
+[ERROR]   location: class com.smartcampus.operationshub.common.entity.Notification
+[ERROR] /C:/Users/llith/OneDrive/Desktop/Sync/backend/src/main/java/com/smartcampus/operationshub/users/service/PersistingOidcUserService.java:[129,52] cannot find symbol
+[ERROR]   symbol:   method builder()
+[ERROR]   location: class com.smartcampus.operationshub.common.entity.Notification
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException

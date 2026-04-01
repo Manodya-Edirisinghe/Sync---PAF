@@ -1,5 +1,6 @@
 package com.smartcampus.operationshub.users.service;
 
+import java.util.Objects;
 import com.smartcampus.operationshub.common.entity.Notification;
 import com.smartcampus.operationshub.common.repository.NotificationRepository;
 import com.smartcampus.operationshub.users.entity.Role;
@@ -125,11 +126,12 @@ public class PersistingOidcUserService extends OidcUserService {
                      savedUser.getId(), savedUser.getEmail(), savedUser.getRoles(), isNewUser);
 
             if (isNewUser) {
-                notificationRepository.save(Notification.builder()
+                Notification regNote = Notification.builder()
                         .message("New user registered: " + savedUser.getEmail())
                         .type("USER_REGISTRATION")
                         .read(false)
-                        .build());
+                        .build();
+                notificationRepository.save(Objects.requireNonNull(regNote));
                 log.info("🔔 Notification created for new user registration (OIDC)");
             }
 
@@ -221,7 +223,7 @@ public class PersistingOidcUserService extends OidcUserService {
 
     private String resolveDisplayName(OidcUser oidcUser, String email) {
         String name = oidcUser.getFullName();
-        if (StringUtils.hasText(name)) return name.trim();
+        if (StringUtils.hasText(name)) return Objects.requireNonNull(name).trim();
         if (StringUtils.hasText(email)) return email;
         return "Unknown User";
     }

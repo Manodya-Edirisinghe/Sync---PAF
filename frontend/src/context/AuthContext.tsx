@@ -1,15 +1,7 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react"
+import type { AuthUser } from "@/types"
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8080"
-
-export interface AuthUser {
-  id: string
-  email: string
-  displayName: string
-  avatarUrl: string
-  roles: string[]
-  createdAt: string
-}
 
 interface AuthContextValue {
   user: AuthUser | null
@@ -75,6 +67,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   )
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useAuth() {
   return useContext(AuthContext)
 }

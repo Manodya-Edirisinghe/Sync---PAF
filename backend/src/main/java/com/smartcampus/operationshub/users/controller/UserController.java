@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.smartcampus.operationshub.users.entity.Role;
 import java.util.UUID;
+import java.util.Objects;
 
 
 @RestController
@@ -75,7 +76,7 @@ public class UserController {
      */
     @PutMapping("/admin/users/{id}/roles")
     public ResponseEntity<?> updateRoles(@PathVariable UUID id, @RequestBody List<String> roleNames) {
-        return userRepository.findById(id).map(user -> {
+        return userRepository.findById(Objects.requireNonNull(id)).map(user -> {
             if (user.isAdminProtected() && !roleNames.contains("ADMIN")) {
                 return ResponseEntity.status(403).body(Map.of("error", "This administrative account is protected and cannot be revoked."));
             }

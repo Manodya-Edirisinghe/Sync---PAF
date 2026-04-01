@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { useAuth } from "@/context/AuthContext"
+import type { AuthUser } from "@/types"
 import {
   CalendarCheck,
   AlertTriangle,
@@ -82,7 +83,7 @@ function Avatar({ src, name, size = "md" }: { src?: string; name: string; size?:
 }
 
 interface ProfileDropdownProps {
-  user: any;
+  user: AuthUser;
   logout: () => void;
   roleCfg: { label: string; color: string; bg: string; border: string };
   joinedDate: string;
@@ -162,9 +163,12 @@ export default function Dashboard() {
     const fetchStats = async () => {
       try {
         const res = await fetch(`${API_BASE_URL}/api/stats`, { credentials: "include" })
-        if (res.ok) setStats(await res.json())
-      } catch (err) {
-        console.error("Fetch stats failed:", err)
+        if (res.ok) {
+          const data = await res.json() as typeof stats;
+          setStats(data);
+        }
+      } catch (err: unknown) {
+        console.error("Fetch stats failed:", err instanceof Error ? err.message : String(err))
       }
     }
     fetchStats()

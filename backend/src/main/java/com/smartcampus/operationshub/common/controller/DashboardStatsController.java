@@ -6,20 +6,28 @@ import com.smartcampus.operationshub.common.dto.StatsDTO;
 import com.smartcampus.operationshub.facilities.repository.ResourceRepository;
 import com.smartcampus.operationshub.incidents.repository.TicketRepository;
 import com.smartcampus.operationshub.users.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/stats")
-@RequiredArgsConstructor
 public class DashboardStatsController {
 
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
     private final TicketRepository ticketRepository;
     private final ResourceRepository resourceRepository;
+
+    public DashboardStatsController(UserRepository userRepository, 
+                                    BookingRepository bookingRepository, 
+                                    TicketRepository ticketRepository, 
+                                    ResourceRepository resourceRepository) {
+        this.userRepository = userRepository;
+        this.bookingRepository = bookingRepository;
+        this.ticketRepository = ticketRepository;
+        this.resourceRepository = resourceRepository;
+    }
 
     @GetMapping
     public StatsDTO getStats() {

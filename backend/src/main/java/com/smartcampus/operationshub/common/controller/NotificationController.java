@@ -1,8 +1,8 @@
 package com.smartcampus.operationshub.common.controller;
 
+import java.util.Objects;
 import com.smartcampus.operationshub.common.entity.Notification;
 import com.smartcampus.operationshub.common.repository.NotificationRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,11 +10,14 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/notifications")
-@RequiredArgsConstructor
 @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 public class NotificationController {
 
     private final NotificationRepository notificationRepository;
+
+    public NotificationController(NotificationRepository notificationRepository) {
+        this.notificationRepository = notificationRepository;
+    }
 
     @GetMapping
     public ResponseEntity<List<Notification>> getNotifications() {
@@ -23,7 +26,7 @@ public class NotificationController {
 
     @PatchMapping("/{id}/read")
     public ResponseEntity<Void> markAsRead(@PathVariable Long id) {
-        notificationRepository.findById(id).ifPresent(n -> {
+        notificationRepository.findById(Objects.requireNonNull(id)).ifPresent(n -> {
             n.setRead(true);
             notificationRepository.save(n);
         });
@@ -32,7 +35,7 @@ public class NotificationController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteNotification(@PathVariable Long id) {
-        notificationRepository.deleteById(id);
+        notificationRepository.deleteById(Objects.requireNonNull(id));
         return ResponseEntity.ok().build();
     }
 }
