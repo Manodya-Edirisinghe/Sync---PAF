@@ -32,8 +32,8 @@ mvn spring-boot:run
 2. Start frontend:
 
 ```bash
-npm --prefix ui install
-npm --prefix ui run dev
+npm --prefix frontend install
+npm --prefix frontend run dev
 ```
 
 Frontend runs on `http://localhost:5173` (or next available port).
