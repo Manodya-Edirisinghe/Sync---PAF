@@ -37,6 +37,9 @@ public class SecurityConfig {
     @Value("${app.frontend-url:http://localhost:5173}")
     private String frontendUrl;
 
+    @Value("${spring.security.oauth2.client.registration.google.client-id:}")
+    private String googleClientId;
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -116,6 +119,11 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()); // Disable CSRF for API usage; re-enable in production
 
         if (oauth2Enabled) {
+            String idStatus = (googleClientId == null || googleClientId.isEmpty()) 
+                ? "NOT LOADED (EMPTY)" 
+                : "LOADED (Len: " + googleClientId.length() + ", Starts with: " + googleClientId.substring(0, Math.min(5, googleClientId.length())) + "...)";
+            log.info("### Google OAuth Client ID {}: ###", idStatus);
+            
             log.info("### Configuring OAuth2 login with custom PersistingOAuth2UserService ###");
             OAuth2AuthorizationRequestResolver resolver = googleAccountChooserRequestResolver(clientRegistrationRepositoryProvider.getIfAvailable());
             http.oauth2Login(oauth2 -> {
