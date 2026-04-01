@@ -1,4 +1,4 @@
-import { useState, useEffect, ElementType } from "react"
+import { useState, useEffect, type ElementType } from "react"
 import { useNavigate } from "react-router-dom"
 import { useAuth } from "@/context/AuthContext"
 import {
