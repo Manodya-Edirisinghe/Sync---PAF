@@ -40,6 +40,9 @@ public class SecurityConfig {
     @Value("${spring.security.oauth2.client.registration.google.client-id:}")
     private String googleClientId;
 
+    @Value("${spring.security.oauth2.client.registration.google.client-secret:}")
+    private String googleClientSecret;
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -91,13 +94,14 @@ public class SecurityConfig {
             HttpCookieOAuth2AuthorizationRequestRepository cookieAuthorizationRequestRepository
     ) throws Exception {
         boolean oauth2Enabled = clientRegistrationRepositoryProvider.getIfAvailable() != null;
+        boolean oauth2CredentialsConfigured = hasValidGoogleOauthCredentials();
 
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> {
                     // Public routes
                     auth.requestMatchers("/", "/login", "/api/login", "/error", "/oauth2/callback").permitAll();
-                    if (oauth2Enabled) {
+                    if (oauth2Enabled && oauth2CredentialsConfigured) {
                         auth.requestMatchers("/oauth2/**", "/login/oauth2/**").permitAll();
                     }
                     // Role-based access control
@@ -119,7 +123,7 @@ public class SecurityConfig {
                 )
                 .csrf(csrf -> csrf.disable()); // Disable CSRF for API usage; re-enable in production
 
-        if (oauth2Enabled) {
+        if (oauth2Enabled && oauth2CredentialsConfigured) {
             String idStatus = (googleClientId == null || googleClientId.isEmpty()) 
                 ? "NOT LOADED (EMPTY)" 
                 : "LOADED (Len: " + googleClientId.length() + ", Starts with: " + googleClientId.substring(0, Math.min(5, googleClientId.length())) + "...)";
@@ -138,9 +142,25 @@ public class SecurityConfig {
                 });
                 oauth2.successHandler(oauthSuccessHandler);
             });
+        } else if (oauth2Enabled) {
+            log.warn("Google OAuth is disabled for this run because client credentials are missing or placeholder values.");
+            log.warn("Set SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID and SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET in .env");
         }
 
         return http.build();
+    }
+
+    private boolean hasValidGoogleOauthCredentials() {
+        return isConfigured(googleClientId)
+                && isConfigured(googleClientSecret)
+                && !googleClientId.toLowerCase().contains("local-dev-google-client-id")
+                && !googleClientSecret.toLowerCase().contains("local-dev-google-client-secret")
+                && !googleClientId.toLowerCase().contains("your-google-client-id-here")
+                && !googleClientSecret.toLowerCase().contains("your-google-client-secret-here");
+    }
+
+    private boolean isConfigured(String value) {
+        return value != null && !value.trim().isEmpty();
     }
 
     private OAuth2AuthorizationRequestResolver googleAccountChooserRequestResolver(
