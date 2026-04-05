@@ -9,5 +9,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface BookingRepository extends JpaRepository<Booking, UUID> {
     List<Booking> findByStatus(BookingStatus status);
-    List<Booking> findByFacilityIdAndStartsAtLessThanEqualAndEndsAtGreaterThanEqual(UUID facilityId, Instant start, Instant end);
+    List<Booking> findByFacilityIdAndStartsAtLessThanEqualAndEndsAtGreaterThanEqual(Long facilityId, Instant start, Instant end);
 }

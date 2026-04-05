@@ -8,7 +8,6 @@ import jakarta.validation.constraints.Min;
 import java.net.URI;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -43,7 +42,7 @@ public class FacilityController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Facility> getFacilityById(@PathVariable UUID id) {
+    public ResponseEntity<Facility> getFacilityById(@PathVariable Long id) {
         return ResponseEntity.ok(facilityService.getFacilityById(id));
     }
 
@@ -57,12 +56,12 @@ public class FacilityController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Facility> updateFacility(@PathVariable UUID id, @Valid @RequestBody Facility facility) {
+    public ResponseEntity<Facility> updateFacility(@PathVariable Long id, @Valid @RequestBody Facility facility) {
         return ResponseEntity.ok(facilityService.updateFacility(id, facility));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteFacility(@PathVariable UUID id) {
+    public ResponseEntity<Void> deleteFacility(@PathVariable Long id) {
         facilityService.deleteFacility(id);
         return ResponseEntity.noContent().build();
     }

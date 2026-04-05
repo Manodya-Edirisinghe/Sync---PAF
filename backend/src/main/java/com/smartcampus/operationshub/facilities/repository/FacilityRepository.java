@@ -4,12 +4,11 @@ import com.smartcampus.operationshub.facilities.entity.Facility;
 import com.smartcampus.operationshub.facilities.entity.FacilityStatus;
 import com.smartcampus.operationshub.facilities.entity.FacilityType;
 import java.util.List;
-import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-public interface FacilityRepository extends JpaRepository<Facility, UUID> {
+public interface FacilityRepository extends JpaRepository<Facility, Long> {
     boolean existsByName(String name);
 
     List<Facility> findByStatus(FacilityStatus status);

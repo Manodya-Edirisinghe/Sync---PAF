@@ -2,7 +2,6 @@ package com.smartcampus.operationshub.facilities.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
@@ -13,22 +12,19 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 @Entity
 @Table(name = "facilities")
-@EntityListeners(AuditingEntityListener.class)
 public class Facility {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @NotBlank
     @Column(nullable = false)
@@ -39,13 +35,11 @@ public class Facility {
     @Column(nullable = false)
     private FacilityType type;
 
-    @NotNull
     @Min(1)
     @Column(nullable = false)
-    private Integer capacity;
+    private int capacity;
 
-    @NotBlank
-    @Column(nullable = false)
+    @Column
     private String location;
 
     @Column
@@ -54,24 +48,24 @@ public class Facility {
     @NotNull
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private FacilityStatus status;
+    private FacilityStatus status = FacilityStatus.ACTIVE;
 
     @OneToMany(mappedBy = "facility")
     private Set<com.smartcampus.operationshub.bookings.entity.Booking> bookings = new HashSet<>();
 
-    @CreatedDate
+    @CreationTimestamp
     @Column(nullable = false, updatable = false)
-    private Instant createdAt;
+    private LocalDateTime createdAt;
 
-    @LastModifiedDate
+    @UpdateTimestamp
     @Column(nullable = false)
-    private Instant updatedAt;
+    private LocalDateTime updatedAt;
 
-    public UUID getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -91,11 +85,11 @@ public class Facility {
         this.type = type;
     }
 
-    public Integer getCapacity() {
+    public int getCapacity() {
         return capacity;
     }
 
-    public void setCapacity(Integer capacity) {
+    public void setCapacity(int capacity) {
         this.capacity = capacity;
     }
 
@@ -131,19 +125,11 @@ public class Facility {
         this.bookings = bookings;
     }
 
-    public Instant getCreatedAt() {
+    public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Instant createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public Instant getUpdatedAt() {
+    public LocalDateTime getUpdatedAt() {
         return updatedAt;
-    }
-
-    public void setUpdatedAt(Instant updatedAt) {
-        this.updatedAt = updatedAt;
     }
 }

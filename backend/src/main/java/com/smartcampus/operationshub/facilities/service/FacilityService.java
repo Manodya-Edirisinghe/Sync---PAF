@@ -7,7 +7,6 @@ import com.smartcampus.operationshub.facilities.exception.FacilityNotFoundExcept
 import com.smartcampus.operationshub.facilities.repository.FacilityRepository;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -29,8 +28,8 @@ public class FacilityService {
     }
 
     @Transactional(readOnly = true)
-    public Facility getFacilityById(UUID id) {
-        UUID facilityId = Objects.requireNonNull(id, "id must not be null");
+    public Facility getFacilityById(Long id) {
+        Long facilityId = Objects.requireNonNull(id, "id must not be null");
         return facilityRepository.findById(facilityId)
                 .orElseThrow(() -> new FacilityNotFoundException(id));
     }
@@ -44,7 +43,7 @@ public class FacilityService {
         return facilityRepository.save(facility);
     }
 
-    public Facility updateFacility(UUID id, Facility updatedFacility) {
+    public Facility updateFacility(Long id, Facility updatedFacility) {
         Facility existingFacility = getFacilityById(id);
 
         existingFacility.setName(updatedFacility.getName());
@@ -58,7 +57,7 @@ public class FacilityService {
         return facilityRepository.save(existingFacility);
     }
 
-    public void deleteFacility(UUID id) {
+    public void deleteFacility(Long id) {
         Facility facility = getFacilityById(id);
         facilityRepository.delete(Objects.requireNonNull(facility, "facility must not be null"));
     }
