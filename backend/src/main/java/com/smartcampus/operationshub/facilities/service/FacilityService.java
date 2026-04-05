@@ -1,5 +1,7 @@
 package com.smartcampus.operationshub.facilities.service;
 
+import com.smartcampus.operationshub.facilities.dto.FacilityRequestDto;
+import com.smartcampus.operationshub.facilities.dto.FacilityResponseDto;
 import com.smartcampus.operationshub.facilities.entity.Facility;
 import com.smartcampus.operationshub.facilities.entity.FacilityStatus;
 import com.smartcampus.operationshub.facilities.entity.FacilityType;
@@ -22,52 +24,56 @@ public class FacilityService {
     }
 
     @Transactional(readOnly = true)
-    public List<Facility> getAllFacilities(FacilityType type, String location, Integer minCapacity) {
+    public List<FacilityResponseDto> getAllFacilities(FacilityType type, String location, Integer minCapacity) {
         String normalizedLocation = StringUtils.hasText(location) ? location.trim() : null;
-        return facilityRepository.search(type, minCapacity, normalizedLocation);
+        return facilityRepository.search(type, minCapacity, normalizedLocation)
+                .stream()
+                .map(FacilityResponseDto::fromEntity)
+                .toList();
     }
 
     @Transactional(readOnly = true)
-    public Facility getFacilityById(Long id) {
-        Long facilityId = Objects.requireNonNull(id, "id must not be null");
-        return facilityRepository.findById(facilityId)
-                .orElseThrow(() -> new FacilityNotFoundException(id));
+    public FacilityResponseDto getFacilityById(Long id) {
+        Facility facility = findOrThrow(id);
+        return FacilityResponseDto.fromEntity(facility);
     }
 
-    public Facility createFacility(Facility facility) {
-        facility.setId(null);
+    public FacilityResponseDto createFacility(FacilityRequestDto dto) {
+        Facility facility = new Facility();
+        applyDto(facility, dto);
         if (facility.getStatus() == null) {
             facility.setStatus(FacilityStatus.ACTIVE);
         }
-        normalize(facility);
-        return facilityRepository.save(facility);
+        Facility saved = facilityRepository.save(facility);
+        return FacilityResponseDto.fromEntity(saved);
     }
 
-    public Facility updateFacility(Long id, Facility updatedFacility) {
-        Facility existingFacility = getFacilityById(id);
-
-        existingFacility.setName(updatedFacility.getName());
-        existingFacility.setType(updatedFacility.getType());
-        existingFacility.setCapacity(updatedFacility.getCapacity());
-        existingFacility.setLocation(updatedFacility.getLocation());
-        existingFacility.setAvailabilityWindows(updatedFacility.getAvailabilityWindows());
-        existingFacility.setStatus(updatedFacility.getStatus());
-
-        normalize(existingFacility);
-        return facilityRepository.save(existingFacility);
+    public FacilityResponseDto updateFacility(Long id, FacilityRequestDto dto) {
+        Facility facility = findOrThrow(id);
+        applyDto(facility, dto);
+        Facility saved = facilityRepository.save(facility);
+        return FacilityResponseDto.fromEntity(saved);
     }
 
     public void deleteFacility(Long id) {
-        Facility facility = getFacilityById(id);
-        facilityRepository.delete(Objects.requireNonNull(facility, "facility must not be null"));
+        Facility facility = findOrThrow(id);
+        facilityRepository.delete(facility);
     }
 
-    private void normalize(Facility facility) {
-        if (facility.getName() != null) {
-            facility.setName(facility.getName().trim());
-        }
-        if (facility.getLocation() != null) {
-            facility.setLocation(facility.getLocation().trim());
+    private Facility findOrThrow(Long id) {
+        Objects.requireNonNull(id, "id must not be null");
+        return facilityRepository.findById(id)
+                .orElseThrow(() -> new FacilityNotFoundException(id));
+    }
+
+    private void applyDto(Facility facility, FacilityRequestDto dto) {
+        facility.setName(dto.getName() != null ? dto.getName().trim() : null);
+        facility.setType(dto.getType());
+        facility.setCapacity(dto.getCapacity());
+        facility.setLocation(dto.getLocation() != null ? dto.getLocation().trim() : null);
+        facility.setAvailabilityWindows(dto.getAvailabilityWindows());
+        if (dto.getStatus() != null) {
+            facility.setStatus(dto.getStatus());
         }
     }
 }
