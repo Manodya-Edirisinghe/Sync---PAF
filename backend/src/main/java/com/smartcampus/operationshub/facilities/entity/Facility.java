@@ -22,9 +22,9 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
-@Table(name = "resources")
+@Table(name = "facilities")
 @EntityListeners(AuditingEntityListener.class)
-public class Resource {
+public class Facility {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -37,7 +37,7 @@ public class Resource {
     @NotNull
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private ResourceType type;
+    private FacilityType type;
 
     @NotNull
     @Min(1)
@@ -48,12 +48,15 @@ public class Resource {
     @Column(nullable = false)
     private String location;
 
+    @Column
+    private String availabilityWindows;
+
     @NotNull
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private ResourceStatus status;
+    private FacilityStatus status;
 
-    @OneToMany(mappedBy = "resource")
+    @OneToMany(mappedBy = "facility")
     private Set<com.smartcampus.operationshub.bookings.entity.Booking> bookings = new HashSet<>();
 
     @CreatedDate
@@ -80,11 +83,11 @@ public class Resource {
         this.name = name;
     }
 
-    public ResourceType getType() {
+    public FacilityType getType() {
         return type;
     }
 
-    public void setType(ResourceType type) {
+    public void setType(FacilityType type) {
         this.type = type;
     }
 
@@ -104,11 +107,19 @@ public class Resource {
         this.location = location;
     }
 
-    public ResourceStatus getStatus() {
+    public String getAvailabilityWindows() {
+        return availabilityWindows;
+    }
+
+    public void setAvailabilityWindows(String availabilityWindows) {
+        this.availabilityWindows = availabilityWindows;
+    }
+
+    public FacilityStatus getStatus() {
         return status;
     }
 
-    public void setStatus(ResourceStatus status) {
+    public void setStatus(FacilityStatus status) {
         this.status = status;
     }
 

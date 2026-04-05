@@ -1,6 +1,6 @@
 package com.smartcampus.operationshub.bookings.entity;
 
-import com.smartcampus.operationshub.facilities.entity.Resource;
+import com.smartcampus.operationshub.facilities.entity.Facility;
 import com.smartcampus.operationshub.users.entity.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -43,8 +43,8 @@ public class Booking {
     private User user;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "resource_id", nullable = false)
-    private Resource resource;
+    @JoinColumn(name = "facility_id", nullable = false)
+    private Facility facility;
 
     @Column(nullable = false)
     private Instant startsAt;

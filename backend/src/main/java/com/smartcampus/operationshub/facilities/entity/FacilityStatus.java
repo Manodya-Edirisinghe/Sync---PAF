@@ -1,6 +1,6 @@
 package com.smartcampus.operationshub.facilities.entity;
 
-public enum ResourceStatus {
+public enum FacilityStatus {
     ACTIVE,
     OUT_OF_SERVICE
 }

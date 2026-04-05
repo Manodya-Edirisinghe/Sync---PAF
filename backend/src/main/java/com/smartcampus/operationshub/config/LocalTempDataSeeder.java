@@ -1,9 +1,9 @@
 package com.smartcampus.operationshub.config;
 
-import com.smartcampus.operationshub.facilities.entity.Resource;
-import com.smartcampus.operationshub.facilities.entity.ResourceStatus;
-import com.smartcampus.operationshub.facilities.entity.ResourceType;
-import com.smartcampus.operationshub.facilities.repository.ResourceRepository;
+import com.smartcampus.operationshub.facilities.entity.Facility;
+import com.smartcampus.operationshub.facilities.entity.FacilityStatus;
+import com.smartcampus.operationshub.facilities.entity.FacilityType;
+import com.smartcampus.operationshub.facilities.repository.FacilityRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -16,24 +16,24 @@ import org.springframework.context.annotation.Profile;
 public class LocalTempDataSeeder {
 
     private static final Logger log = LoggerFactory.getLogger(LocalTempDataSeeder.class);
-    private static final String TEMP_RESOURCE_NAME = "TEMP_SYNC_DB_CHECK";
+    private static final String TEMP_FACILITY_NAME = "TEMP_SYNC_DB_CHECK";
 
     @Bean
-    CommandLineRunner seedTemporaryResource(ResourceRepository resourceRepository) {
+    CommandLineRunner seedTemporaryFacility(FacilityRepository facilityRepository) {
         return args -> {
-            if (resourceRepository.existsByName(TEMP_RESOURCE_NAME)) {
-                log.info("Temporary DB check record already exists: {}", TEMP_RESOURCE_NAME);
+            if (facilityRepository.existsByName(TEMP_FACILITY_NAME)) {
+                log.info("Temporary DB check record already exists: {}", TEMP_FACILITY_NAME);
                 return;
             }
 
-            Resource resource = new Resource();
-            resource.setName(TEMP_RESOURCE_NAME);
-            resource.setType(ResourceType.LAB);
-            resource.setCapacity(10);
-            resource.setLocation("Sync Test Zone");
-            resource.setStatus(ResourceStatus.ACTIVE);
+            Facility facility = new Facility();
+            facility.setName(TEMP_FACILITY_NAME);
+            facility.setType(FacilityType.LAB);
+            facility.setCapacity(10);
+            facility.setLocation("Sync Test Zone");
+            facility.setStatus(FacilityStatus.ACTIVE);
 
-            Resource saved = resourceRepository.save(resource);
+            Facility saved = facilityRepository.save(facility);
             log.info("Inserted temporary DB check record id={} name={}", saved.getId(), saved.getName());
         };
     }

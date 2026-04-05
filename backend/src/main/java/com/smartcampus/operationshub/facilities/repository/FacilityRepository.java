@@ -1,0 +1,34 @@
+package com.smartcampus.operationshub.facilities.repository;
+
+import com.smartcampus.operationshub.facilities.entity.Facility;
+import com.smartcampus.operationshub.facilities.entity.FacilityStatus;
+import com.smartcampus.operationshub.facilities.entity.FacilityType;
+import java.util.List;
+import java.util.UUID;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+public interface FacilityRepository extends JpaRepository<Facility, UUID> {
+    boolean existsByName(String name);
+
+    List<Facility> findByStatus(FacilityStatus status);
+
+    List<Facility> findByType(FacilityType type);
+
+    List<Facility> findByCapacityGreaterThanEqual(Integer capacity);
+
+    List<Facility> findByLocationContainingIgnoreCase(String location);
+
+    @Query("""
+        SELECT f
+        FROM Facility f
+        WHERE (:type IS NULL OR f.type = :type)
+          AND (:minCapacity IS NULL OR f.capacity >= :minCapacity)
+          AND (:location IS NULL OR LOWER(f.location) LIKE LOWER(CONCAT('%', :location, '%')))
+        """)
+    List<Facility> search(
+        @Param("type") FacilityType type,
+        @Param("minCapacity") Integer minCapacity,
+        @Param("location") String location);
+}

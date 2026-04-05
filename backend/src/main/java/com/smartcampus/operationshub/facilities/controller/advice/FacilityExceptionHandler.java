@@ -1,6 +1,6 @@
 package com.smartcampus.operationshub.facilities.controller.advice;
 
-import com.smartcampus.operationshub.facilities.exception.ResourceNotFoundException;
+import com.smartcampus.operationshub.facilities.exception.FacilityNotFoundException;
 import jakarta.validation.ConstraintViolationException;
 import java.time.Instant;
 import java.util.HashMap;
@@ -13,10 +13,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice(basePackages = "com.smartcampus.operationshub.facilities.controller")
-public class ResourceExceptionHandler {
+public class FacilityExceptionHandler {
 
-    @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<Map<String, Object>> handleNotFound(ResourceNotFoundException ex) {
+    @ExceptionHandler(FacilityNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleNotFound(FacilityNotFoundException ex) {
         return build(HttpStatus.NOT_FOUND, ex.getMessage(), null);
     }
 
