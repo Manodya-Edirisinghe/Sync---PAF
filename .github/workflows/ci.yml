@@ -10,6 +10,7 @@ jobs:
   backend:
     name: Backend Build and Test
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     defaults:
       run:
         working-directory: backend
@@ -30,6 +31,7 @@ jobs:
   frontend:
     name: Frontend Build and Lint
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     defaults:
       run:
         working-directory: frontend
