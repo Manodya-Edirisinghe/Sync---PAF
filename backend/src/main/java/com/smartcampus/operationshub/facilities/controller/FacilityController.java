@@ -3,6 +3,7 @@ package com.smartcampus.operationshub.facilities.controller;
 import com.smartcampus.operationshub.facilities.dto.FacilityRequestDto;
 import com.smartcampus.operationshub.facilities.dto.FacilityResponseDto;
 import com.smartcampus.operationshub.facilities.dto.StatusUpdateDto;
+import com.smartcampus.operationshub.facilities.entity.FacilityStatus;
 import com.smartcampus.operationshub.facilities.entity.FacilityType;
 import com.smartcampus.operationshub.facilities.service.FacilityService;
 import jakarta.validation.Valid;
@@ -42,10 +43,11 @@ public class FacilityController {
     @GetMapping("/search")
     public ResponseEntity<List<FacilityResponseDto>> searchFacilities(
             @RequestParam(required = false) FacilityType type,
+            @RequestParam(required = false) FacilityStatus status,
             @RequestParam(required = false) String location,
             @RequestParam(required = false) @Min(1) Integer minCapacity) {
 
-        return ResponseEntity.ok(facilityService.searchFacilities(type, location, minCapacity));
+        return ResponseEntity.ok(facilityService.searchFacilities(type, status, location, minCapacity));
     }
 
     @GetMapping("/{id}")

@@ -10,7 +10,7 @@ public interface FacilityService {
 
     List<FacilityResponseDto> getAllFacilities();
 
-    List<FacilityResponseDto> searchFacilities(FacilityType type, String location, Integer minCapacity);
+    List<FacilityResponseDto> searchFacilities(FacilityType type, FacilityStatus status, String location, Integer minCapacity);
 
     FacilityResponseDto getFacilityById(Long id);
 

@@ -26,11 +26,13 @@ public interface FacilityRepository extends JpaRepository<Facility, Long> {
         SELECT f
         FROM Facility f
         WHERE (:type IS NULL OR f.type = :type)
+          AND (:status IS NULL OR f.status = :status)
           AND (:minCapacity IS NULL OR f.capacity >= :minCapacity)
           AND (:location IS NULL OR LOWER(f.location) LIKE LOWER(CONCAT('%', :location, '%')))
         """)
     List<Facility> search(
         @Param("type") FacilityType type,
+        @Param("status") FacilityStatus status,
         @Param("minCapacity") Integer minCapacity,
         @Param("location") String location);
 }

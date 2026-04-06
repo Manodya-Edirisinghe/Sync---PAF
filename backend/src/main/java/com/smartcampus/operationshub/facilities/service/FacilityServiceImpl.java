@@ -34,9 +34,9 @@ public class FacilityServiceImpl implements FacilityService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<FacilityResponseDto> searchFacilities(FacilityType type, String location, Integer minCapacity) {
+    public List<FacilityResponseDto> searchFacilities(FacilityType type, FacilityStatus status, String location, Integer minCapacity) {
         String normalizedLocation = StringUtils.hasText(location) ? location.trim() : null;
-        return facilityRepository.search(type, minCapacity, normalizedLocation)
+        return facilityRepository.search(type, status, minCapacity, normalizedLocation)
                 .stream()
                 .map(FacilityResponseDto::fromEntity)
                 .toList();
