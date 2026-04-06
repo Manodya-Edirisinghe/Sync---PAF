@@ -32,13 +32,17 @@ public class FacilityController {
     }
 
     @GetMapping
-    public ResponseEntity<List<FacilityResponseDto>> getAllFacilities(
+    public ResponseEntity<List<FacilityResponseDto>> getAllFacilities() {
+        return ResponseEntity.ok(facilityService.getAllFacilities());
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<FacilityResponseDto>> searchFacilities(
             @RequestParam(required = false) FacilityType type,
             @RequestParam(required = false) String location,
             @RequestParam(required = false) @Min(1) Integer minCapacity) {
 
-        List<FacilityResponseDto> facilities = facilityService.getAllFacilities(type, location, minCapacity);
-        return ResponseEntity.ok(facilities);
+        return ResponseEntity.ok(facilityService.searchFacilities(type, location, minCapacity));
     }
 
     @GetMapping("/{id}")
