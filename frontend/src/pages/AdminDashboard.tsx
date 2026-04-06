@@ -17,8 +17,10 @@ import {
   CheckCircle2,
   Trash2,
   BellRing,
-  Lock
+  Lock,
+  Building2
 } from "lucide-react"
+import AdminFacilitiesPanel from "@/pages/AdminFacilitiesPanel"
 
 // --- Types ---
 interface User {
@@ -416,6 +418,7 @@ export default function AdminDashboard() {
         <nav className="flex-1 px-6 space-y-3 overflow-y-auto custom-scrollbar">
           <p className="text-[9px] font-black text-white/40 uppercase tracking-[.4em] px-4 mb-4">Core Governance</p>
           <NavItem icon={Users} label="User Management" active={activeTab === "users"} onClick={() => setActiveTab("users")} badge="Active" />
+          <NavItem icon={Building2} label="Facilities" active={activeTab === "facilities"} onClick={() => setActiveTab("facilities")} />
           <NavItem icon={BellRing} label="Audit Alerts" active={activeTab === "notifications"} onClick={() => setActiveTab("notifications")} badge={stats.pendingApprovalCount > 0 ? stats.pendingApprovalCount.toString() : undefined} />
           
           <div className="py-8" />
@@ -449,7 +452,7 @@ export default function AdminDashboard() {
             <div className="flex items-center gap-3 text-white/50 text-[10px] font-black uppercase tracking-widest">
               <span>Admin</span>
               <ChevronRight className="h-3 w-3" />
-              <span className="text-white">{activeTab === 'users' ? 'Identity Governance' : activeTab === 'notifications' ? 'Audit Alerts' : activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}</span>
+              <span className="text-white">{activeTab === 'users' ? 'Identity Governance' : activeTab === 'facilities' ? 'Facility Registry' : activeTab === 'notifications' ? 'Audit Alerts' : activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}</span>
             </div>
             <div className="flex items-center gap-6">
               <button 
@@ -479,6 +482,7 @@ export default function AdminDashboard() {
           {/* Dynamic Content */}
           <div className="relative">
             {activeTab === "users" && <UserManagement />}
+            {activeTab === "facilities" && <AdminFacilitiesPanel />}
             {activeTab === "notifications" && <NotificationsCenter />}
             {activeTab === "analytics" && <PlaceholderTab title="Neural Analytics" description="Advanced telemetry and system health indicators powered by behavioral patterns." icon={BarChart3} />}
             {activeTab === "settings" && <PlaceholderTab title="System Architecture" description="Global configuration matrices and secure environment variables management." icon={Settings} />}
