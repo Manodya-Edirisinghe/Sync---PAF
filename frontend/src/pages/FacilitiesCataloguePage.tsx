@@ -7,7 +7,6 @@ import {
   Users,
   ArrowLeft,
   Search,
-  Loader2,
   AlertCircle,
 } from "lucide-react"
 
