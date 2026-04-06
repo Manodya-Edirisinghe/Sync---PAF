@@ -4,6 +4,7 @@ import { LoginPage } from "@/components/LoginPage"
 import { ProtectedRoute } from "@/components/ProtectedRoute"
 import Dashboard from "@/pages/Dashboard"
 import AdminDashboard from "@/pages/AdminDashboard"
+import FacilitiesCataloguePage from "@/pages/FacilitiesCataloguePage"
 import OAuthCallback from "@/pages/OAuthCallback"
 
 function App() {
@@ -27,6 +28,24 @@ function App() {
             }
           />
           
+          {/* Facilities catalogue */}
+          <Route
+            path="/facilities"
+            element={
+              <ProtectedRoute>
+                <FacilitiesCataloguePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/facilities/:id"
+            element={
+              <ProtectedRoute>
+                <FacilitiesCataloguePage />
+              </ProtectedRoute>
+            }
+          />
+
           {/* Admin routes */}
           <Route
             path="/admin"
