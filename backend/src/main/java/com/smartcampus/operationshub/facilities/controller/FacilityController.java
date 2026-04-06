@@ -2,6 +2,7 @@ package com.smartcampus.operationshub.facilities.controller;
 
 import com.smartcampus.operationshub.facilities.dto.FacilityRequestDto;
 import com.smartcampus.operationshub.facilities.dto.FacilityResponseDto;
+import com.smartcampus.operationshub.facilities.dto.StatusUpdateDto;
 import com.smartcampus.operationshub.facilities.entity.FacilityType;
 import com.smartcampus.operationshub.facilities.service.FacilityService;
 import jakarta.validation.Valid;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -64,6 +66,14 @@ public class FacilityController {
             @PathVariable Long id,
             @Valid @RequestBody FacilityRequestDto dto) {
         return ResponseEntity.ok(facilityService.updateFacility(id, dto));
+    }
+
+    @PatchMapping("/{id}/status")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<FacilityResponseDto> updateFacilityStatus(
+            @PathVariable Long id,
+            @Valid @RequestBody StatusUpdateDto dto) {
+        return ResponseEntity.ok(facilityService.updateFacilityStatus(id, dto.getStatus()));
     }
 
     @DeleteMapping("/{id}")

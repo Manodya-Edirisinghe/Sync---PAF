@@ -69,6 +69,14 @@ public class FacilityServiceImpl implements FacilityService {
     }
 
     @Override
+    public FacilityResponseDto updateFacilityStatus(Long id, FacilityStatus status) {
+        Facility facility = findOrThrow(id);
+        facility.setStatus(status);
+        Facility saved = facilityRepository.save(facility);
+        return FacilityResponseDto.fromEntity(saved);
+    }
+
+    @Override
     public void deleteFacility(Long id) {
         Facility facility = findOrThrow(id);
         facilityRepository.delete(facility);
