@@ -24,6 +24,8 @@ Thumbs.db
 logs/
 
 ## Environment files
+.env
+.env.*
 !.env.example
 !.env.*.example
 !**/.env.example
