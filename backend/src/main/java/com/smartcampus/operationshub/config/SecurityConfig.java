@@ -112,6 +112,7 @@ public class SecurityConfig {
                     // Everything else requires authentication
                     auth.anyRequest().authenticated();
                 })
+                .httpBasic(basic -> {})
                 .formLogin(form -> form
                         .defaultSuccessUrl(frontendUrl + "/dashboard", true)
                         .permitAll()
