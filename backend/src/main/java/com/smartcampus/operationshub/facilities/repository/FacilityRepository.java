@@ -28,7 +28,7 @@ public interface FacilityRepository extends JpaRepository<Facility, Long> {
         WHERE (CAST(:type AS string) IS NULL OR f.type = :type)
           AND (CAST(:status AS string) IS NULL OR f.status = :status)
           AND (:minCapacity IS NULL OR f.capacity >= :minCapacity)
-          AND (:location IS NULL OR LOWER(f.location) LIKE LOWER(CONCAT('%', :location, '%')))
+          AND (CAST(:location AS string) IS NULL OR LOWER(f.location) LIKE LOWER(CONCAT('%', CAST(:location AS string), '%')))
         """)
     List<Facility> search(
         @Param("type") FacilityType type,
