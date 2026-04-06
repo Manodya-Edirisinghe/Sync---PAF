@@ -5,6 +5,7 @@ import { ProtectedRoute } from "@/components/ProtectedRoute"
 import Dashboard from "@/pages/Dashboard"
 import AdminDashboard from "@/pages/AdminDashboard"
 import FacilitiesCataloguePage from "@/pages/FacilitiesCataloguePage"
+import FacilityDetailPage from "@/pages/FacilityDetailPage"
 import OAuthCallback from "@/pages/OAuthCallback"
 
 function App() {
@@ -41,7 +42,7 @@ function App() {
             path="/facilities/:id"
             element={
               <ProtectedRoute>
-                <FacilitiesCataloguePage />
+                <FacilityDetailPage />
               </ProtectedRoute>
             }
           />
