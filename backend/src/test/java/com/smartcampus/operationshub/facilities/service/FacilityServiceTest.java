@@ -1,5 +1,7 @@
 package com.smartcampus.operationshub.facilities.service;
 
+import com.smartcampus.operationshub.common.entity.Notification;
+import com.smartcampus.operationshub.common.repository.NotificationRepository;
 import com.smartcampus.operationshub.facilities.dto.FacilityRequestDto;
 import com.smartcampus.operationshub.facilities.dto.FacilityResponseDto;
 import com.smartcampus.operationshub.facilities.entity.Facility;
@@ -18,7 +20,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -27,6 +31,9 @@ class FacilityServiceTest {
 
     @Mock
     private FacilityRepository facilityRepository;
+
+    @Mock
+    private NotificationRepository notificationRepository;
 
     @InjectMocks
     private FacilityServiceImpl facilityService;
@@ -101,6 +108,9 @@ class FacilityServiceTest {
         assertThat(result.getName()).isEqualTo("New Hall");
         assertThat(result.getStatus()).isEqualTo(FacilityStatus.ACTIVE);
         verify(facilityRepository).save(any(Facility.class));
+        verify(notificationRepository).save(argThat((Notification n) ->
+                n.getType().equals("FACILITY_CREATED")
+                        && n.getMessage().contains("New Hall")));
     }
 
     @Test
@@ -121,6 +131,21 @@ class FacilityServiceTest {
 
         assertThat(result.getStatus()).isEqualTo(FacilityStatus.OUT_OF_SERVICE);
         verify(facilityRepository).save(any(Facility.class));
+        verify(notificationRepository).save(argThat((Notification n) ->
+                n.getType().equals("FACILITY_STATUS_UPDATED")
+                        && n.getMessage().contains("OUT_OF_SERVICE")));
+    }
+
+    @Test
+    void deleteFacility_success_savesNotification() {
+        when(facilityRepository.findById(1L)).thenReturn(Optional.of(sampleFacility));
+
+        assertThatCode(() -> facilityService.deleteFacility(1L)).doesNotThrowAnyException();
+
+        verify(facilityRepository).delete(sampleFacility);
+        verify(notificationRepository).save(argThat((Notification n) ->
+                n.getType().equals("FACILITY_DELETED")
+                        && n.getMessage().contains("id 1")));
     }
 
     @Test

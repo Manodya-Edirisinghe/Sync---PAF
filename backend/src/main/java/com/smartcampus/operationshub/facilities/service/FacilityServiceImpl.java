@@ -1,5 +1,7 @@
 package com.smartcampus.operationshub.facilities.service;
 
+import com.smartcampus.operationshub.common.entity.Notification;
+import com.smartcampus.operationshub.common.repository.NotificationRepository;
 import com.smartcampus.operationshub.facilities.dto.FacilityRequestDto;
 import com.smartcampus.operationshub.facilities.dto.FacilityResponseDto;
 import com.smartcampus.operationshub.facilities.entity.Facility;
@@ -18,9 +20,12 @@ import org.springframework.util.StringUtils;
 public class FacilityServiceImpl implements FacilityService {
 
     private final FacilityRepository facilityRepository;
+    private final NotificationRepository notificationRepository;
 
-    public FacilityServiceImpl(FacilityRepository facilityRepository) {
+    public FacilityServiceImpl(FacilityRepository facilityRepository,
+                               NotificationRepository notificationRepository) {
         this.facilityRepository = facilityRepository;
+        this.notificationRepository = notificationRepository;
     }
 
     @Override
@@ -57,6 +62,14 @@ public class FacilityServiceImpl implements FacilityService {
             facility.setStatus(FacilityStatus.ACTIVE);
         }
         Facility saved = facilityRepository.save(facility);
+
+        notificationRepository.save(Notification.builder()
+                .message("[FACILITIES] New facility added: " + saved.getName()
+                        + " (" + saved.getType() + ") at " + saved.getLocation())
+                .type("FACILITY_CREATED")
+                .read(false)
+                .build());
+
         return FacilityResponseDto.fromEntity(saved);
     }
 
@@ -65,6 +78,13 @@ public class FacilityServiceImpl implements FacilityService {
         Facility facility = findOrThrow(id);
         applyDto(facility, dto);
         Facility saved = facilityRepository.save(facility);
+
+        notificationRepository.save(Notification.builder()
+                .message("[FACILITIES] Facility '" + saved.getName() + "' has been updated")
+                .type("FACILITY_UPDATED")
+                .read(false)
+                .build());
+
         return FacilityResponseDto.fromEntity(saved);
     }
 
@@ -73,6 +93,14 @@ public class FacilityServiceImpl implements FacilityService {
         Facility facility = findOrThrow(id);
         facility.setStatus(status);
         Facility saved = facilityRepository.save(facility);
+
+        notificationRepository.save(Notification.builder()
+                .message("[FACILITIES] Facility '" + saved.getName()
+                        + "' status changed to " + status)
+                .type("FACILITY_STATUS_UPDATED")
+                .read(false)
+                .build());
+
         return FacilityResponseDto.fromEntity(saved);
     }
 
@@ -80,6 +108,12 @@ public class FacilityServiceImpl implements FacilityService {
     public void deleteFacility(Long id) {
         Facility facility = findOrThrow(id);
         facilityRepository.delete(facility);
+
+        notificationRepository.save(Notification.builder()
+                .message("[FACILITIES] Facility with id " + id + " has been removed")
+                .type("FACILITY_DELETED")
+                .read(false)
+                .build());
     }
 
     private Facility findOrThrow(Long id) {
