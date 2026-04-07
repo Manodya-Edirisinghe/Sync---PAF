@@ -27,25 +27,59 @@ interface Facility {
 interface FormData {
   name: string
   type: string
-  capacity: number
+  capacity: string
   location: string
-  availabilityWindows: string
   status: string
+}
+
+interface AvailabilityData {
+  days: string[]
+  startTime: string
+  endTime: string
+}
+
+interface FormErrors {
+  name?: string
+  type?: string
+  capacity?: string
+  location?: string
+  days?: string
+  startTime?: string
+  endTime?: string
 }
 
 const EMPTY_FORM: FormData = {
   name: "",
   type: "LAB",
-  capacity: 1,
+  capacity: "",
   location: "",
-  availabilityWindows: "",
   status: "ACTIVE",
 }
 
+const EMPTY_AVAILABILITY: AvailabilityData = {
+  days: [],
+  startTime: "",
+  endTime: "",
+}
+
 const TYPE_OPTIONS = ["LECTURE_HALL", "LAB", "MEETING_ROOM", "EQUIPMENT"]
+const DAY_OPTIONS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 
 function typeLabel(t: string) {
   return t.replace(/_/g, " ")
+}
+
+function parseAvailabilityWindows(value: string | null): AvailabilityData {
+  if (!value) return { ...EMPTY_AVAILABILITY }
+  // e.g. "Mon, Wed, Fri 09:00-17:00"
+  const match = value.match(/^(.+?)\s+(\d{2}:\d{2})-(\d{2}:\d{2})$/)
+  if (!match) return { ...EMPTY_AVAILABILITY }
+  const days = match[1].split(",").map((d) => d.trim()).filter(Boolean)
+  return { days, startTime: match[2], endTime: match[3] }
+}
+
+function buildAvailabilityString(data: AvailabilityData): string {
+  return `${data.days.join(", ")} ${data.startTime}-${data.endTime}`
 }
 
 export default function AdminFacilitiesPanel() {
@@ -57,6 +91,8 @@ export default function AdminFacilitiesPanel() {
   const [modalOpen, setModalOpen] = useState(false)
   const [editId, setEditId] = useState<number | null>(null)
   const [form, setForm] = useState<FormData>(EMPTY_FORM)
+  const [availability, setAvailability] = useState<AvailabilityData>(EMPTY_AVAILABILITY)
+  const [errors, setErrors] = useState<FormErrors>({})
   const [saving, setSaving] = useState(false)
 
   // delete confirm
@@ -84,6 +120,8 @@ export default function AdminFacilitiesPanel() {
   const openCreate = () => {
     setEditId(null)
     setForm(EMPTY_FORM)
+    setAvailability({ ...EMPTY_AVAILABILITY })
+    setErrors({})
     setModalOpen(true)
   }
 
@@ -92,24 +130,76 @@ export default function AdminFacilitiesPanel() {
     setForm({
       name: f.name,
       type: f.type,
-      capacity: f.capacity,
+      capacity: String(f.capacity),
       location: f.location ?? "",
-      availabilityWindows: f.availabilityWindows ?? "",
       status: f.status,
     })
+    setAvailability(parseAvailabilityWindows(f.availabilityWindows))
+    setErrors({})
     setModalOpen(true)
   }
 
+  const clearError = (field: keyof FormErrors) => {
+    if (errors[field]) {
+      setErrors((prev) => {
+        const next = { ...prev }
+        delete next[field]
+        return next
+      })
+    }
+  }
+
+  const validate = (): FormErrors => {
+    const e: FormErrors = {}
+    if (!form.name.trim()) e.name = "Name is required"
+    else if (form.name.trim().length < 3) e.name = "Name must be at least 3 characters"
+    else if (form.name.trim().length > 100) e.name = "Name must be at most 100 characters"
+
+    if (!form.type) e.type = "Type is required"
+
+    const cap = Number(form.capacity)
+    if (!form.capacity.trim()) e.capacity = "Capacity is required"
+    else if (isNaN(cap) || !Number.isInteger(cap)) e.capacity = "Must be a whole number"
+    else if (cap < 1) e.capacity = "Minimum capacity is 1"
+    else if (cap > 500) e.capacity = "Maximum capacity is 500"
+
+    if (!form.location.trim()) e.location = "Location is required"
+    else if (form.location.trim().length < 3) e.location = "Location must be at least 3 characters"
+
+    if (availability.days.length === 0) e.days = "Select at least one day"
+    if (!availability.startTime) e.startTime = "Start time is required"
+    if (!availability.endTime) e.endTime = "End time is required"
+    if (availability.startTime && availability.endTime && availability.endTime <= availability.startTime) {
+      e.endTime = "End time must be after start time"
+    }
+
+    return e
+  }
+
   const handleSave = async () => {
+    const validationErrors = validate()
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors)
+      return
+    }
+
     setSaving(true)
     try {
+      const payload = {
+        name: form.name.trim(),
+        type: form.type,
+        capacity: Number(form.capacity),
+        location: form.location.trim(),
+        availabilityWindows: buildAvailabilityString(availability),
+        status: form.status,
+      }
       const url = editId
         ? `${API_BASE_URL}/api/v1/facilities/${editId}`
         : `${API_BASE_URL}/api/v1/facilities`
       const res = await fetch(url, {
         method: editId ? "PUT" : "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify(payload),
         credentials: "include",
       })
       if (res.ok) {
@@ -155,6 +245,14 @@ export default function AdminFacilitiesPanel() {
     } finally {
       setDeleting(false)
     }
+  }
+
+  const toggleDay = (day: string) => {
+    clearError("days")
+    setAvailability((prev) => ({
+      ...prev,
+      days: prev.days.includes(day) ? prev.days.filter((d) => d !== day) : [...prev.days, day],
+    }))
   }
 
   const filtered = facilities.filter((f) => {
@@ -325,7 +423,7 @@ export default function AdminFacilitiesPanel() {
       {modalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setModalOpen(false)} />
-          <div className="relative w-full max-w-lg rounded-[32px] border border-white/10 bg-[#0a0a0a] p-10 shadow-2xl">
+          <div className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-[32px] border border-white/10 bg-[#0a0a0a] p-10 shadow-2xl">
             <div className="mb-8 flex items-center justify-between">
               <h3 className="text-2xl font-black uppercase tracking-tight">
                 {editId ? "Edit Facility" : "New Facility"}
@@ -339,22 +437,22 @@ export default function AdminFacilitiesPanel() {
             </div>
 
             <div className="space-y-5">
-              <Field label="Name">
+              <Field label="Name" error={errors.name}>
                 <input
                   type="text"
                   value={form.name}
-                  onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  className="w-full rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-4 text-sm font-bold text-white outline-none focus:border-indigo-500/50 focus:bg-white/[0.05] transition-all placeholder:text-white/30"
+                  onChange={(e) => { setForm({ ...form, name: e.target.value }); clearError("name") }}
+                  className={`w-full rounded-2xl border ${errors.name ? "border-red-500/50" : "border-white/10"} bg-white/[0.03] px-5 py-4 text-sm font-bold text-white outline-none focus:border-indigo-500/50 focus:bg-white/[0.05] transition-all placeholder:text-white/30`}
                   placeholder="e.g. Main Laboratory"
                 />
               </Field>
 
               <div className="grid grid-cols-2 gap-4">
-                <Field label="Type">
+                <Field label="Type" error={errors.type}>
                   <select
                     value={form.type}
-                    onChange={(e) => setForm({ ...form, type: e.target.value })}
-                    className="w-full rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-4 text-sm font-bold text-white outline-none focus:border-indigo-500/50 transition-all appearance-none"
+                    onChange={(e) => { setForm({ ...form, type: e.target.value }); clearError("type") }}
+                    className={`w-full rounded-2xl border ${errors.type ? "border-red-500/50" : "border-white/10"} bg-white/[0.03] px-5 py-4 text-sm font-bold text-white outline-none focus:border-indigo-500/50 transition-all appearance-none`}
                   >
                     {TYPE_OPTIONS.map((t) => (
                       <option key={t} value={t} className="bg-[#0a0a0a] text-white">
@@ -364,36 +462,85 @@ export default function AdminFacilitiesPanel() {
                   </select>
                 </Field>
 
-                <Field label="Capacity">
+                <Field label="Capacity" error={errors.capacity}>
                   <input
                     type="number"
                     min={1}
+                    max={500}
                     value={form.capacity}
-                    onChange={(e) => setForm({ ...form, capacity: parseInt(e.target.value) || 1 })}
-                    className="w-full rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-4 text-sm font-bold text-white outline-none focus:border-indigo-500/50 transition-all"
+                    onChange={(e) => { setForm({ ...form, capacity: e.target.value }); clearError("capacity") }}
+                    className={`w-full rounded-2xl border ${errors.capacity ? "border-red-500/50" : "border-white/10"} bg-white/[0.03] px-5 py-4 text-sm font-bold text-white outline-none focus:border-indigo-500/50 transition-all no-spinner`}
+                    placeholder=""
                   />
                 </Field>
               </div>
 
-              <Field label="Location">
+              <Field label="Location" error={errors.location}>
                 <input
                   type="text"
                   value={form.location}
-                  onChange={(e) => setForm({ ...form, location: e.target.value })}
-                  className="w-full rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-4 text-sm font-bold text-white outline-none focus:border-indigo-500/50 transition-all placeholder:text-white/30"
+                  onChange={(e) => { setForm({ ...form, location: e.target.value }); clearError("location") }}
+                  className={`w-full rounded-2xl border ${errors.location ? "border-red-500/50" : "border-white/10"} bg-white/[0.03] px-5 py-4 text-sm font-bold text-white outline-none focus:border-indigo-500/50 transition-all placeholder:text-white/30`}
                   placeholder="e.g. Building A, Floor 2"
                 />
               </Field>
 
-              <Field label="Availability Windows">
-                <input
-                  type="text"
-                  value={form.availabilityWindows}
-                  onChange={(e) => setForm({ ...form, availabilityWindows: e.target.value })}
-                  className="w-full rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-4 text-sm font-bold text-white outline-none focus:border-indigo-500/50 transition-all placeholder:text-white/30"
-                  placeholder="e.g. Mon-Fri 08:00-18:00"
-                />
-              </Field>
+              {/* Availability Windows */}
+              <div>
+                <label className="mb-2 block text-[10px] font-black uppercase tracking-[0.3em] text-white/50">
+                  Availability Windows
+                </label>
+
+                {/* Day checkboxes */}
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {DAY_OPTIONS.map((day) => {
+                    const selected = availability.days.includes(day)
+                    return (
+                      <button
+                        key={day}
+                        type="button"
+                        onClick={() => toggleDay(day)}
+                        className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider border transition-all ${
+                          selected
+                            ? "bg-indigo-500/20 text-indigo-400 border-indigo-500/30"
+                            : "bg-white/[0.03] text-white/40 border-white/10 hover:bg-white/[0.06] hover:text-white/60"
+                        }`}
+                      >
+                        {day}
+                      </button>
+                    )
+                  })}
+                </div>
+                {errors.days && <p className="text-red-400 text-xs font-bold mb-3">{errors.days}</p>}
+
+                {/* Time range */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="mb-1.5 block text-[9px] font-black uppercase tracking-[0.2em] text-white/40">
+                      Start Time
+                    </label>
+                    <input
+                      type="time"
+                      value={availability.startTime}
+                      onChange={(e) => { setAvailability({ ...availability, startTime: e.target.value }); clearError("startTime") }}
+                      className={`w-full rounded-2xl border ${errors.startTime ? "border-red-500/50" : "border-white/10"} bg-white/[0.03] px-5 py-3.5 text-sm font-bold text-white outline-none focus:border-indigo-500/50 transition-all`}
+                    />
+                    {errors.startTime && <p className="text-red-400 text-xs font-bold mt-1.5">{errors.startTime}</p>}
+                  </div>
+                  <div>
+                    <label className="mb-1.5 block text-[9px] font-black uppercase tracking-[0.2em] text-white/40">
+                      End Time
+                    </label>
+                    <input
+                      type="time"
+                      value={availability.endTime}
+                      onChange={(e) => { setAvailability({ ...availability, endTime: e.target.value }); clearError("endTime") }}
+                      className={`w-full rounded-2xl border ${errors.endTime ? "border-red-500/50" : "border-white/10"} bg-white/[0.03] px-5 py-3.5 text-sm font-bold text-white outline-none focus:border-indigo-500/50 transition-all`}
+                    />
+                    {errors.endTime && <p className="text-red-400 text-xs font-bold mt-1.5">{errors.endTime}</p>}
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div className="mt-10 flex items-center justify-end gap-4">
@@ -405,7 +552,7 @@ export default function AdminFacilitiesPanel() {
               </button>
               <button
                 onClick={handleSave}
-                disabled={saving || !form.name.trim() || !form.location.trim()}
+                disabled={saving}
                 className="px-8 py-4 rounded-2xl bg-indigo-500 hover:bg-indigo-600 disabled:opacity-40 disabled:cursor-not-allowed text-[10px] font-black uppercase tracking-widest text-white transition-all active:scale-95 shadow-xl shadow-indigo-500/20"
               >
                 {saving ? "Saving..." : editId ? "Update" : "Create"}
@@ -445,17 +592,30 @@ export default function AdminFacilitiesPanel() {
           </div>
         </div>
       )}
+
+      {/* Hide number input spinner arrows */}
+      <style>{`
+        .no-spinner::-webkit-outer-spin-button,
+        .no-spinner::-webkit-inner-spin-button {
+          -webkit-appearance: none;
+          margin: 0;
+        }
+        .no-spinner {
+          -moz-appearance: textfield;
+        }
+      `}</style>
     </div>
   )
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function Field({ label, error, children }: { label: string; error?: string; children: React.ReactNode }) {
   return (
     <div>
       <label className="mb-2 block text-[10px] font-black uppercase tracking-[0.3em] text-white/50">
         {label}
       </label>
       {children}
+      {error && <p className="text-red-400 text-xs font-bold mt-1.5">{error}</p>}
     </div>
   )
 }
