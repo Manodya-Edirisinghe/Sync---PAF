@@ -42,6 +42,7 @@ export default function FacilitiesCataloguePage() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [search, setSearch] = useState("")
+  const [selectedType, setSelectedType] = useState("ALL")
 
   useEffect(() => {
     const fetchFacilities = async () => {
@@ -65,8 +66,12 @@ export default function FacilitiesCataloguePage() {
 
   if (!user) return null
 
+  const availableTypes = Array.from(new Set(facilities.map((f) => f.type))).sort()
+
   const filtered = facilities.filter((f) => {
     const q = search.toLowerCase()
+    const matchesType = selectedType === "ALL" || f.type === selectedType
+    if (!matchesType) return false
     return (
       f.name.toLowerCase().includes(q) ||
       f.type.toLowerCase().includes(q) ||
@@ -100,16 +105,30 @@ export default function FacilitiesCataloguePage() {
           </div>
         </div>
 
-        {/* Search bar */}
-        <div className="relative mb-8">
-          <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-white/30" />
-          <input
-            type="text"
-            placeholder="Search by name, type, or location…"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full rounded-2xl border border-white/10 bg-white/5 py-3 pl-11 pr-4 text-sm text-white placeholder:text-white/30 outline-none transition focus:border-white/20 focus:bg-white/[0.07]"
-          />
+        {/* Search and type filter */}
+        <div className="mb-8 grid gap-3 md:grid-cols-[1fr_220px]">
+          <div className="relative">
+            <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-white/30" />
+            <input
+              type="text"
+              placeholder="Search by name, type, or location…"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full rounded-2xl border border-white/10 bg-white/5 py-3 pl-11 pr-4 text-sm text-white placeholder:text-white/30 outline-none transition focus:border-white/20 focus:bg-white/[0.07]"
+            />
+          </div>
+          <select
+            value={selectedType}
+            onChange={(e) => setSelectedType(e.target.value)}
+            className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white outline-none transition focus:border-white/20 focus:bg-white/[0.07]"
+          >
+            <option value="ALL" className="bg-[#111111]">All types</option>
+            {availableTypes.map((type) => (
+              <option key={type} value={type} className="bg-[#111111]">
+                {typeLabel(type)}
+              </option>
+            ))}
+          </select>
         </div>
 
         {/* Loading state */}

@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo, useRef } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import { useAuth } from "@/context/AuthContext"
+import { QRCodeCanvas } from "qrcode.react"
 import {
   ArrowLeft,
   Building2,
@@ -43,6 +44,7 @@ export default function FacilityDetailPage() {
   const [facility, setFacility] = useState<Facility | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const qrCardRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
     const fetchFacility = async () => {
@@ -72,6 +74,21 @@ export default function FacilityDetailPage() {
 
   const typeStyle = facility ? (TYPE_STYLES[facility.type] ?? TYPE_STYLES.EQUIPMENT) : TYPE_STYLES.EQUIPMENT
   const isActive = facility?.status === "ACTIVE"
+  const facilityUrl = useMemo(() => {
+    if (!id) return ""
+    return `${window.location.origin}/facilities/${id}`
+  }, [id])
+
+  const downloadQrCode = () => {
+    const canvas = qrCardRef.current?.querySelector("canvas")
+    if (!canvas || !facility) return
+
+    const pngUrl = canvas.toDataURL("image/png")
+    const link = document.createElement("a")
+    link.href = pngUrl
+    link.download = `${facility.name.replace(/\s+/g, "-").toLowerCase()}-qr.png`
+    link.click()
+  }
 
   return (
     <div className="min-h-svh bg-[#030303] text-white font-sans selection:bg-indigo-500/30 overflow-x-hidden relative">
@@ -185,6 +202,22 @@ export default function FacilityDetailPage() {
                 label="Added"
                 value={facility.createdAt}
               />
+            </div>
+
+            <div className="rounded-2xl border border-white/[0.06] bg-white/[0.03] p-5">
+              <h2 className="text-sm font-semibold uppercase tracking-wider text-white/50">Facility QR</h2>
+              <div className="mt-4 flex flex-col items-center gap-3" ref={qrCardRef}>
+                <div className="rounded-xl bg-white p-3">
+                  <QRCodeCanvas value={facilityUrl} size={156} includeMargin={true} />
+                </div>
+                <p className="text-sm text-white/55">Scan to view this facility</p>
+                <button
+                  onClick={downloadQrCode}
+                  className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm transition hover:bg-white/10"
+                >
+                  Download PNG
+                </button>
+              </div>
             </div>
           </div>
         )}
