@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -30,6 +31,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
 
     private static final Logger log = LoggerFactory.getLogger(SecurityConfig.class);
@@ -39,6 +41,9 @@ public class SecurityConfig {
 
     @Value("${spring.security.oauth2.client.registration.google.client-id:}")
     private String googleClientId;
+
+    @Value("${spring.security.oauth2.client.registration.google.client-secret:}")
+    private String googleClientSecret;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -72,7 +77,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(java.util.List.of("http://localhost:5173", "http://localhost:5174"));
-        configuration.setAllowedMethods(java.util.List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedMethods(java.util.List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(java.util.List.of("*"));
         configuration.setAllowCredentials(true);
 
@@ -91,13 +96,14 @@ public class SecurityConfig {
             HttpCookieOAuth2AuthorizationRequestRepository cookieAuthorizationRequestRepository
     ) throws Exception {
         boolean oauth2Enabled = clientRegistrationRepositoryProvider.getIfAvailable() != null;
+        boolean oauth2CredentialsConfigured = hasValidGoogleOauthCredentials();
 
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> {
                     // Public routes
                     auth.requestMatchers("/", "/login", "/api/login", "/error", "/oauth2/callback").permitAll();
-                    if (oauth2Enabled) {
+                    if (oauth2Enabled && oauth2CredentialsConfigured) {
                         auth.requestMatchers("/oauth2/**", "/login/oauth2/**").permitAll();
                     }
                     // Role-based access control
@@ -106,6 +112,7 @@ public class SecurityConfig {
                     // Everything else requires authentication
                     auth.anyRequest().authenticated();
                 })
+                .httpBasic(basic -> {})
                 .formLogin(form -> form
                         .defaultSuccessUrl(frontendUrl + "/dashboard", true)
                         .permitAll()
@@ -117,9 +124,29 @@ public class SecurityConfig {
                         .deleteCookies("JSESSIONID")
                         .permitAll()
                 )
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            if (request.getRequestURI().startsWith("/api/")) {
+                                response.setStatus(401);
+                                response.setContentType("application/json");
+                                response.getWriter().write("{\"error\": \"Unauthorized\"}");
+                            } else {
+                                response.sendRedirect("/login");
+                            }
+                        })
+                        .accessDeniedHandler((request, response, accessDeniedException) -> {
+                            if (request.getRequestURI().startsWith("/api/")) {
+                                response.setStatus(403);
+                                response.setContentType("application/json");
+                                response.getWriter().write("{\"error\": \"Forbidden\"}");
+                            } else {
+                                response.sendRedirect("/login");
+                            }
+                        })
+                )
                 .csrf(csrf -> csrf.disable()); // Disable CSRF for API usage; re-enable in production
 
-        if (oauth2Enabled) {
+        if (oauth2Enabled && oauth2CredentialsConfigured) {
             String idStatus = (googleClientId == null || googleClientId.isEmpty()) 
                 ? "NOT LOADED (EMPTY)" 
                 : "LOADED (Len: " + googleClientId.length() + ", Starts with: " + googleClientId.substring(0, Math.min(5, googleClientId.length())) + "...)";
@@ -138,9 +165,25 @@ public class SecurityConfig {
                 });
                 oauth2.successHandler(oauthSuccessHandler);
             });
+        } else if (oauth2Enabled) {
+            log.warn("Google OAuth is disabled for this run because client credentials are missing or placeholder values.");
+            log.warn("Set SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID and SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET in .env");
         }
 
         return http.build();
+    }
+
+    private boolean hasValidGoogleOauthCredentials() {
+        return isConfigured(googleClientId)
+                && isConfigured(googleClientSecret)
+                && !googleClientId.toLowerCase().contains("local-dev-google-client-id")
+                && !googleClientSecret.toLowerCase().contains("local-dev-google-client-secret")
+                && !googleClientId.toLowerCase().contains("your-google-client-id-here")
+                && !googleClientSecret.toLowerCase().contains("your-google-client-secret-here");
+    }
+
+    private boolean isConfigured(String value) {
+        return value != null && !value.trim().isEmpty();
     }
 
     private OAuth2AuthorizationRequestResolver googleAccountChooserRequestResolver(

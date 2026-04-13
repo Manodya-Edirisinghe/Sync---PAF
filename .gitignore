@@ -25,7 +25,7 @@ logs/
 
 ## Environment files
 .env
-**/.env
+.env.*
 !.env.example
 !.env.*.example
 !**/.env.example
@@ -37,3 +37,5 @@ coverage/
 ## Frontend build cache
 ui/.vite/
 config.bat
+temp_auto_push.bat
+temp_interactive_push.bat

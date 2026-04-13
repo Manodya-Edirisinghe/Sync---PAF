@@ -3,7 +3,7 @@ package com.smartcampus.operationshub.common.controller;
 import com.smartcampus.operationshub.bookings.entity.BookingStatus;
 import com.smartcampus.operationshub.bookings.repository.BookingRepository;
 import com.smartcampus.operationshub.common.dto.StatsDTO;
-import com.smartcampus.operationshub.facilities.repository.ResourceRepository;
+import com.smartcampus.operationshub.facilities.repository.FacilityRepository;
 import com.smartcampus.operationshub.incidents.repository.TicketRepository;
 import com.smartcampus.operationshub.users.repository.UserRepository;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,16 +17,16 @@ public class DashboardStatsController {
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
     private final TicketRepository ticketRepository;
-    private final ResourceRepository resourceRepository;
+    private final FacilityRepository facilityRepository;
 
-    public DashboardStatsController(UserRepository userRepository, 
-                                    BookingRepository bookingRepository, 
-                                    TicketRepository ticketRepository, 
-                                    ResourceRepository resourceRepository) {
+    public DashboardStatsController(UserRepository userRepository,
+                                    BookingRepository bookingRepository,
+                                    TicketRepository ticketRepository,
+                                    FacilityRepository facilityRepository) {
         this.userRepository = userRepository;
         this.bookingRepository = bookingRepository;
         this.ticketRepository = ticketRepository;
-        this.resourceRepository = resourceRepository;
+        this.facilityRepository = facilityRepository;
     }
 
     @GetMapping
@@ -35,7 +35,7 @@ public class DashboardStatsController {
                 .userCount(userRepository.count())
                 .bookingCount(bookingRepository.count())
                 .incidentCount(ticketRepository.count())
-                .resourceCount(resourceRepository.count())
+                .resourceCount(facilityRepository.count())
                 .pendingApprovalCount(bookingRepository.findByStatus(BookingStatus.PENDING).size())
                 .build();
     }

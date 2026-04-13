@@ -28,34 +28,38 @@ const QUICK_ACTIONS = [
     color: "from-blue-500/20 to-transparent", 
     border: "border-blue-500/20", 
     iconColor: "text-blue-400",
-    shadow: "shadow-blue-500/10"
+    shadow: "shadow-blue-500/10",
+    href: "",
   },
-  { 
-    icon: AlertTriangle, 
-    label: "Incident Reports",  
-    description: "Submit and track campus incidents",    
-    color: "from-orange-500/20 to-transparent", 
-    border: "border-orange-500/20", 
+  {
+    icon: AlertTriangle,
+    label: "Incident Reports",
+    description: "Submit and track campus incidents",
+    color: "from-orange-500/20 to-transparent",
+    border: "border-orange-500/20",
     iconColor: "text-orange-400",
-    shadow: "shadow-orange-500/10" 
+    shadow: "shadow-orange-500/10",
+    href: "",
   },
-  { 
-    icon: Building2,     
-    label: "Facilities",        
-    description: "Browse campus facility details",       
-    color: "from-purple-500/20 to-transparent", 
-    border: "border-purple-500/20", 
+  {
+    icon: Building2,
+    label: "Facilities",
+    description: "Browse campus facility details",
+    color: "from-purple-500/20 to-transparent",
+    border: "border-purple-500/20",
     iconColor: "text-purple-400",
-    shadow: "shadow-purple-500/10"
+    shadow: "shadow-purple-500/10",
+    href: "/facilities",
   },
-  { 
-    icon: Users,         
-    label: "Directory",         
-    description: "Find staff and student contacts",      
-    color: "from-teal-500/20 to-transparent", 
-    border: "border-teal-500/20", 
+  {
+    icon: Users,
+    label: "Directory",
+    description: "Find staff and student contacts",
+    color: "from-teal-500/20 to-transparent",
+    border: "border-teal-500/20",
     iconColor: "text-teal-400",
-    shadow: "shadow-teal-500/10"
+    shadow: "shadow-teal-500/10",
+    href: "",
   },
 ]
 
@@ -298,9 +302,10 @@ export default function Dashboard() {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {QUICK_ACTIONS.map(({ icon: Icon, label, description, color, border, iconColor, shadow }) => (
+            {QUICK_ACTIONS.map(({ icon: Icon, label, description, color, border, iconColor, shadow, href }) => (
               <button
                 key={label}
+                onClick={() => href && navigate(href)}
                 className={`group relative flex items-center gap-8 rounded-[32px] border ${border} bg-gradient-to-br ${color} p-10 text-left transition-all duration-500 hover:shadow-2xl ${shadow} hover:-translate-y-1 overflow-hidden`}
               >
                 <div className="absolute -right-10 -bottom-10 h-40 w-40 bg-white/5 rounded-full blur-3xl group-hover:bg-white/10 transition-colors" />

@@ -1,6 +1,6 @@
 package com.smartcampus.operationshub.facilities.entity;
 
-public enum ResourceType {
+public enum FacilityType {
     LECTURE_HALL,
     LAB,
     MEETING_ROOM,
