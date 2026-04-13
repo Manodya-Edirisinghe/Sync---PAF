@@ -1,0 +1,78 @@
+package com.smartcampus.operationshub.incidents.service;
+
+import com.smartcampus.operationshub.incidents.dto.CreateTicketRequest;
+import com.smartcampus.operationshub.incidents.dto.TicketResponse;
+import com.smartcampus.operationshub.incidents.entity.Ticket;
+import com.smartcampus.operationshub.incidents.entity.TicketStatus;
+import com.smartcampus.operationshub.incidents.repository.TicketRepository;
+import com.smartcampus.operationshub.users.entity.User;
+import com.smartcampus.operationshub.users.repository.UserRepository;
+import java.util.List;
+import java.util.UUID;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+
+@Service
+public class TicketService {
+
+    private final TicketRepository ticketRepository;
+    private final UserRepository userRepository;
+
+    public TicketService(TicketRepository ticketRepository, UserRepository userRepository) {
+        this.ticketRepository = ticketRepository;
+        this.userRepository = userRepository;
+    }
+
+    public TicketResponse createTicket(CreateTicketRequest request, String reporterEmail) {
+        User reporter = userRepository.findByEmail(reporterEmail)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        Ticket ticket = Ticket.builder()
+                .reporter(reporter)
+                .category(request.category())
+                .description(request.description())
+                .priority(request.priority())
+                .preferredContact(request.preferredContact())
+                .attachmentUrls(request.attachmentUrls())
+                .status(TicketStatus.OPEN)
+                .build();
+
+        return TicketResponse.from(ticketRepository.save(ticket));
+    }
+
+    public List<TicketResponse> getAllTickets() {
+        return ticketRepository.findAll()
+                .stream()
+                .map(TicketResponse::from)
+                .toList();
+    }
+
+    public List<TicketResponse> getMyTickets(String reporterEmail) {
+        User reporter = userRepository.findByEmail(reporterEmail)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        return ticketRepository.findByReporterId(reporter.getId())
+                .stream()
+                .map(TicketResponse::from)
+                .toList();
+    }
+
+    public TicketResponse getTicketById(UUID id) {
+        return ticketRepository.findById(id)
+                .map(TicketResponse::from)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ticket not found"));
+    }
+
+    public void deleteTicket(UUID id, String requesterEmail) {
+        Ticket ticket = ticketRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ticket not found"));
+
+        boolean isOwner = ticket.getReporter().getEmail().equalsIgnoreCase(requesterEmail);
+        if (!isOwner) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can only delete your own tickets");
+        }
+
+        ticketRepository.delete(ticket);
+    }
+}
