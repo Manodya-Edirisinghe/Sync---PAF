@@ -55,6 +55,9 @@ public class Ticket {
     @Column(nullable = false)
     private TicketPriority priority;
 
+    @Column(nullable = false)
+    private String preferredContact;
+
     @Builder.Default
     @ElementCollection
     @CollectionTable(name = "ticket_attachments", joinColumns = @JoinColumn(name = "ticket_id"))
