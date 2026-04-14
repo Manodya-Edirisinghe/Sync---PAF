@@ -7,14 +7,11 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -49,9 +46,6 @@ public class Facility {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private FacilityStatus status = FacilityStatus.ACTIVE;
-
-    @OneToMany(mappedBy = "facility")
-    private Set<com.smartcampus.operationshub.bookings.entity.Booking> bookings = new HashSet<>();
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
@@ -115,14 +109,6 @@ public class Facility {
 
     public void setStatus(FacilityStatus status) {
         this.status = status;
-    }
-
-    public Set<com.smartcampus.operationshub.bookings.entity.Booking> getBookings() {
-        return bookings;
-    }
-
-    public void setBookings(Set<com.smartcampus.operationshub.bookings.entity.Booking> bookings) {
-        this.bookings = bookings;
     }
 
     public LocalDateTime getCreatedAt() {

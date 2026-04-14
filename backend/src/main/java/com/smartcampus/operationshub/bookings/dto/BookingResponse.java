@@ -1,67 +1,21 @@
-package com.smartcampus.operationshub.bookings.entity;
+package com.smartcampus.operationshub.bookings.dto;
 
 import com.smartcampus.operationshub.bookings.BookingStatus;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import java.time.LocalDateTime;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
-@Entity
-@Table(name = "bookings")
-public class Booking {
+public class BookingResponse {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @NotNull
-    @Column(name = "facility_id", nullable = false)
     private Long facilityId;
-
-    @NotBlank
-    @Column(name = "user_email", nullable = false)
+    private String facilityName;
     private String userEmail;
-
-    @NotNull
-    @Column(name = "start_time", nullable = false)
     private LocalDateTime startTime;
-
-    @NotNull
-    @Column(name = "end_time", nullable = false)
     private LocalDateTime endTime;
-
-    @NotNull
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private BookingStatus status = BookingStatus.PENDING;
-
-    @NotBlank
-    @Size(max = 500)
-    @Column(nullable = false, length = 500)
+    private BookingStatus status;
     private String purpose;
-
-    @Column
     private Integer attendees;
-
-    @Column(name = "rejection_reason", columnDefinition = "TEXT")
     private String rejectionReason;
-
-    @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
-
-    @UpdateTimestamp
-    @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
     public Long getId() {
@@ -78,6 +32,14 @@ public class Booking {
 
     public void setFacilityId(Long facilityId) {
         this.facilityId = facilityId;
+    }
+
+    public String getFacilityName() {
+        return facilityName;
+    }
+
+    public void setFacilityName(String facilityName) {
+        this.facilityName = facilityName;
     }
 
     public String getUserEmail() {
@@ -140,7 +102,15 @@ public class Booking {
         return createdAt;
     }
 
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }
