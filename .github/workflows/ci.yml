@@ -49,6 +49,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Verify TypeScript version
+        run: npx tsc --version
+
       - name: Lint
         run: npm run lint
 
