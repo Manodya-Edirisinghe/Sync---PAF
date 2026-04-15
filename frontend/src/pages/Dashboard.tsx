@@ -29,7 +29,7 @@ const QUICK_ACTIONS = [
     border: "border-blue-500/20", 
     iconColor: "text-blue-400",
     shadow: "shadow-blue-500/10",
-    href: "",
+    href: "/bookings/my",
   },
   {
     icon: AlertTriangle,

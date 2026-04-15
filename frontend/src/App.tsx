@@ -7,6 +7,7 @@ import AdminDashboard from "@/pages/AdminDashboard"
 import FacilitiesCataloguePage from "@/pages/FacilitiesCataloguePage"
 import FacilityDetailPage from "@/pages/FacilityDetailPage"
 import OAuthCallback from "@/pages/OAuthCallback"
+import MyBookingsPage from "@/pages/bookings/MyBookingsPage"
 
 function App() {
   return (
@@ -43,6 +44,15 @@ function App() {
             element={
               <ProtectedRoute>
                 <FacilityDetailPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/bookings/my"
+            element={
+              <ProtectedRoute>
+                <MyBookingsPage />
               </ProtectedRoute>
             }
           />
