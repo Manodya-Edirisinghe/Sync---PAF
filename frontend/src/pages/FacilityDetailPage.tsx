@@ -70,14 +70,14 @@ export default function FacilityDetailPage() {
     fetchFacility()
   }, [API_BASE_URL, id])
 
-  if (!user) return null
-
   const typeStyle = facility ? (TYPE_STYLES[facility.type] ?? TYPE_STYLES.EQUIPMENT) : TYPE_STYLES.EQUIPMENT
   const isActive = facility?.status === "ACTIVE"
   const facilityUrl = useMemo(() => {
     if (!id) return ""
     return `${window.location.origin}/facilities/${id}`
   }, [id])
+
+  if (!user) return null
 
   const downloadQrCode = () => {
     const canvas = qrCardRef.current?.querySelector("canvas")
