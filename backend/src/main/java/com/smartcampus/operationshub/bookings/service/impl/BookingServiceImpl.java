@@ -17,12 +17,16 @@ import com.smartcampus.operationshub.facilities.repository.FacilityRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
 public class BookingServiceImpl implements BookingService {
+
+    private static final Logger log = LoggerFactory.getLogger(BookingServiceImpl.class);
 
     private final BookingRepository bookingRepository;
     private final FacilityRepository facilityRepository;
@@ -204,7 +208,12 @@ public class BookingServiceImpl implements BookingService {
                 .type("BOOKING")
                 .read(false)
                 .build();
-        notificationRepository.save(notification);
+        try {
+            notificationRepository.save(notification);
+        } catch (RuntimeException ex) {
+            // Notification is non-critical; booking operation should still succeed.
+            log.warn("Failed to persist booking notification for user {}: {}", userEmail, ex.getMessage());
+        }
     }
 
     private String resolveFacilityName(Long facilityId) {
