@@ -272,7 +272,7 @@ function NotificationsCenter() {
         <p className="text-white/60 font-medium max-w-sm">Real-time telemetry and identity lifecycle events requiring administrative oversight.</p>
       </div>
 
-      <div className="grid gap-4">
+      <div className="grid gap-4 max-h-[calc(100vh-280px)] overflow-y-auto pr-4 custom-scrollbar">
         {loading ? (
           <div className="p-20 text-center text-white/10 font-black uppercase tracking-widest border border-white/5 rounded-[40px]">Syncing Telemetry...</div>
         ) : notifications.length === 0 ? (
