@@ -8,6 +8,7 @@ import FacilitiesCataloguePage from "@/pages/FacilitiesCataloguePage"
 import FacilityDetailPage from "@/pages/FacilityDetailPage"
 import OAuthCallback from "@/pages/OAuthCallback"
 import MyBookingsPage from "@/pages/bookings/MyBookingsPage"
+import NewBookingPage from "@/pages/bookings/NewBookingPage"
 
 function App() {
   return (
@@ -53,6 +54,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <MyBookingsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/bookings/new"
+            element={
+              <ProtectedRoute>
+                <NewBookingPage />
               </ProtectedRoute>
             }
           />
