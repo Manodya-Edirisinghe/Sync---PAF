@@ -36,6 +36,7 @@ export default function MyBookingsPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [cancellingId, setCancellingId] = useState<number | null>(null)
+  const [showSubmittedBanner, setShowSubmittedBanner] = useState(false)
 
   const loadBookings = useCallback(async () => {
     try {
@@ -53,6 +54,19 @@ export default function MyBookingsPage() {
   useEffect(() => {
     void loadBookings()
   }, [loadBookings])
+
+  useEffect(() => {
+    const submitted = sessionStorage.getItem("bookingSubmitted")
+    if (submitted === "true") {
+      sessionStorage.removeItem("bookingSubmitted")
+      setShowSubmittedBanner(true)
+      const timer = window.setTimeout(() => {
+        setShowSubmittedBanner(false)
+      }, 3000)
+      return () => window.clearTimeout(timer)
+    }
+    return undefined
+  }, [])
 
   const sortedBookings = useMemo(
     () => [...bookings].sort((a, b) => new Date(b.startTime).getTime() - new Date(a.startTime).getTime()),
@@ -99,6 +113,13 @@ export default function MyBookingsPage() {
           <div className="rounded-2xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-red-400 flex items-center gap-3">
             <CircleAlert className="h-4 w-4" />
             <span>{error}</span>
+          </div>
+        )}
+
+        {showSubmittedBanner && (
+          <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-emerald-400 flex items-center gap-3">
+            <CircleAlert className="h-4 w-4" />
+            <span>Booking submitted!</span>
           </div>
         )}
 

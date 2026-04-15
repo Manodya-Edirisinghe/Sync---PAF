@@ -1,5 +1,15 @@
 const API_BASE = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8080"
 
+export class ApiError extends Error {
+  status: number
+
+  constructor(message: string, status: number) {
+    super(message)
+    this.name = "ApiError"
+    this.status = status
+  }
+}
+
 export interface BookingResponse {
   id: number
   facilityId: number
@@ -39,7 +49,7 @@ async function request<T>(input: string, init?: RequestInit): Promise<T> {
   })
 
   if (!response.ok) {
-    throw new Error(await parseError(response))
+    throw new ApiError(await parseError(response), response.status)
   }
 
   return (await response.json()) as T
