@@ -6,7 +6,6 @@ import com.smartcampus.operationshub.bookings.dto.BookingRequest;
 import com.smartcampus.operationshub.bookings.dto.BookingResponse;
 import com.smartcampus.operationshub.bookings.service.BookingService;
 import jakarta.validation.Valid;
-import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,24 +38,22 @@ public class BookingController {
     public ResponseEntity<BookingResponse> createBooking(@Valid @RequestBody BookingRequest request,
                                                          Authentication authentication) {
         String email = resolveEmail(authentication);
-        BookingResponse created = bookingService.createBooking(email, request);
+        BookingResponse created = bookingService.createBooking(request, email);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @GetMapping("/me")
     public ResponseEntity<List<BookingResponse>> getMyBookings(Authentication authentication) {
         String email = resolveEmail(authentication);
-        return ResponseEntity.ok(bookingService.getMyBookings(email));
+        return ResponseEntity.ok(bookingService.getUserBookings(email));
     }
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<BookingResponse>> getBookingsForAdmin(
             @RequestParam(required = false) Long facilityId,
-            @RequestParam(required = false) BookingStatus status,
-            @RequestParam(required = false) LocalDateTime from,
-            @RequestParam(required = false) LocalDateTime to) {
-        return ResponseEntity.ok(bookingService.getBookingsForAdmin(facilityId, status, from, to));
+            @RequestParam(required = false) BookingStatus status) {
+        return ResponseEntity.ok(bookingService.getAllBookings(status, facilityId));
     }
 
     @PatchMapping("/{id}/approve")
