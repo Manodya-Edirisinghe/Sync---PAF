@@ -12,6 +12,7 @@ interface FacilityOption {
   location: string
   status: string
   capacity: number
+  availabilityWindows?: string | null
 }
 
 interface FormState {
@@ -64,6 +65,30 @@ export default function NewBookingPage() {
   })
 
   const minDate = useMemo(() => todayIsoDate(), [])
+  const selectedFacility = useMemo(
+    () => facilities.find((facility) => String(facility.id) === form.facilityId),
+    [facilities, form.facilityId],
+  )
+  const attendeesCount = useMemo(() => Number(form.attendees), [form.attendees])
+  const hasDateAndTime = useMemo(
+    () => Boolean(form.date && form.startTime && form.endTime),
+    [form.date, form.startTime, form.endTime],
+  )
+  const showCapacityWarning = useMemo(
+    () =>
+      Boolean(
+        selectedFacility &&
+          form.attendees &&
+          hasDateAndTime &&
+          Number.isFinite(attendeesCount) &&
+          attendeesCount > selectedFacility.capacity,
+      ),
+    [selectedFacility, form.attendees, hasDateAndTime, attendeesCount],
+  )
+  const showAvailabilityHint = useMemo(
+    () => Boolean(selectedFacility?.availabilityWindows?.trim()),
+    [selectedFacility],
+  )
 
   useEffect(() => {
     const loadFacilities = async () => {
@@ -215,7 +240,22 @@ export default function NewBookingPage() {
                 ))}
               </select>
               {errors.facilityId && <p className="mt-2 text-sm text-red-400">{errors.facilityId}</p>}
+
+              {showAvailabilityHint && (
+                <div className="mt-3 bg-yellow-500/10 text-yellow-400 border border-yellow-500/20 rounded-xl p-3">
+                  <p>ℹ This facility is available: {selectedFacility?.availabilityWindows}</p>
+                </div>
+              )}
             </div>
+
+            {showCapacityWarning && selectedFacility && (
+              <div className="bg-yellow-500/10 text-yellow-400 border border-yellow-500/20 rounded-xl p-3">
+                <p>
+                  ⚠ Expected attendees ({attendeesCount}) exceeds this facility&apos;s capacity ({selectedFacility.capacity}).
+                  Your request will be reviewed by an admin.
+                </p>
+              </div>
+            )}
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
