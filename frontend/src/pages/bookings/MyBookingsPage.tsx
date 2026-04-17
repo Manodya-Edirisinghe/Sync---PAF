@@ -3,6 +3,7 @@ import { Navigate, useNavigate } from "react-router-dom"
 import { CalendarPlus, CircleAlert, XCircle } from "lucide-react"
 import { useAuth } from "@/context/AuthContext"
 import { cancelBooking, getMyBookings, type BookingResponse } from "@/api/bookingsApi"
+import { exportBookingToICal } from "@/utils/calendarExport"
 
 const STATUS_BADGE: Record<BookingResponse["status"], string> = {
   PENDING: "bg-yellow-500/10 text-yellow-400 border-yellow-500/20",
@@ -197,13 +198,23 @@ export default function MyBookingsPage() {
 
                     <div>
                       {canCancel ? (
-                        <button
-                          disabled={cancellingId === booking.id}
-                          onClick={() => void onCancel(booking)}
-                          className="rounded-xl border border-white/15 bg-white/[0.04] px-3 py-2 text-xs font-bold uppercase tracking-widest text-white/80 hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed transition"
-                        >
-                          {cancellingId === booking.id ? "Cancelling..." : "Cancel"}
-                        </button>
+                        <div className="flex items-center gap-2">
+                          {booking.status === "APPROVED" && (
+                            <button
+                              onClick={() => exportBookingToICal(booking)}
+                              className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 rounded-xl px-4 py-2 text-xs font-bold uppercase tracking-widest transition-all"
+                            >
+                              Add to Calendar
+                            </button>
+                          )}
+                          <button
+                            disabled={cancellingId === booking.id}
+                            onClick={() => void onCancel(booking)}
+                            className="rounded-xl border border-white/15 bg-white/[0.04] px-3 py-2 text-xs font-bold uppercase tracking-widest text-white/80 hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                          >
+                            {cancellingId === booking.id ? "Cancelling..." : "Cancel"}
+                          </button>
+                        </div>
                       ) : (
                         <span className="text-xs text-white/35">-</span>
                       )}
