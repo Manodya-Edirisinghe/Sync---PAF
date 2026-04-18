@@ -8,5 +8,7 @@ public record UpdateTicketRequest(
         @NotNull(message = "Status is required")
         TicketStatus status,
 
-        String rejectionReason
+        String rejectionReason,
+
+        String resolutionNotes
 ) {}

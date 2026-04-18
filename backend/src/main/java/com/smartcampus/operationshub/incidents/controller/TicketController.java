@@ -52,6 +52,11 @@ public class TicketController {
         if (isAdmin) {
             return ResponseEntity.ok(ticketService.getAllTickets());
         }
+        boolean isTechnician = auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_TECHNICIAN"));
+        if (isTechnician) {
+            return ResponseEntity.ok(ticketService.getAssignedTickets(email));
+        }
         return ResponseEntity.ok(ticketService.getMyTickets(email));
     }
 
