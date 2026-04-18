@@ -18,7 +18,9 @@ public record TicketResponse(
         Set<String> attachmentUrls,
         TicketStatus status,
         String assignedTechnicianName,
+        String assignedTechnicianEmail,
         String rejectionReason,
+        String resolutionNotes,
         Instant createdAt,
         Instant updatedAt
 ) {
@@ -34,7 +36,9 @@ public record TicketResponse(
                 ticket.getAttachmentUrls(),
                 ticket.getStatus(),
                 ticket.getAssignedTechnician() != null ? ticket.getAssignedTechnician().getDisplayName() : null,
+                ticket.getAssignedTechnician() != null ? ticket.getAssignedTechnician().getEmail() : null,
                 ticket.getRejectionReason(),
+                ticket.getResolutionNotes(),
                 ticket.getCreatedAt(),
                 ticket.getUpdatedAt()
         );

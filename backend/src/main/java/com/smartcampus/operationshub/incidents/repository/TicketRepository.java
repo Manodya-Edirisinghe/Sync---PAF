@@ -9,4 +9,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface TicketRepository extends JpaRepository<Ticket, UUID> {
     List<Ticket> findByStatus(TicketStatus status);
     List<Ticket> findByReporterId(UUID reporterId);
+    List<Ticket> findByAssignedTechnicianEmail(String email);
 }
