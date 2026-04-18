@@ -65,6 +65,12 @@ public class Ticket {
     @Column(name = "attachment_url", nullable = false, length = 2048)
     private Set<String> attachmentUrls = new HashSet<>();
 
+    @ManyToOne
+    @JoinColumn(name = "assigned_technician_id")
+    private User assignedTechnician;
+
+    private String rejectionReason;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private TicketStatus status;

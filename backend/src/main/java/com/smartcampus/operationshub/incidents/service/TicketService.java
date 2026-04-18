@@ -2,9 +2,11 @@ package com.smartcampus.operationshub.incidents.service;
 
 import com.smartcampus.operationshub.incidents.dto.CreateTicketRequest;
 import com.smartcampus.operationshub.incidents.dto.TicketResponse;
+import com.smartcampus.operationshub.incidents.dto.UpdateTicketRequest;
 import com.smartcampus.operationshub.incidents.entity.Ticket;
 import com.smartcampus.operationshub.incidents.entity.TicketStatus;
 import com.smartcampus.operationshub.incidents.repository.TicketRepository;
+import com.smartcampus.operationshub.users.entity.Role;
 import com.smartcampus.operationshub.users.entity.User;
 import com.smartcampus.operationshub.users.repository.UserRepository;
 import java.util.List;
@@ -62,6 +64,35 @@ public class TicketService {
         return ticketRepository.findById(id)
                 .map(TicketResponse::from)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ticket not found"));
+    }
+
+    public TicketResponse updateStatus(UUID id, UpdateTicketRequest request) {
+        Ticket ticket = ticketRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ticket not found"));
+
+        if (request.status() == TicketStatus.REJECTED && (request.rejectionReason() == null || request.rejectionReason().isBlank())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Rejection reason is required when rejecting a ticket");
+        }
+
+        ticket.setStatus(request.status());
+        ticket.setRejectionReason(request.rejectionReason());
+
+        return TicketResponse.from(ticketRepository.save(ticket));
+    }
+
+    public TicketResponse assignTechnician(UUID ticketId, UUID technicianId) {
+        Ticket ticket = ticketRepository.findById(ticketId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ticket not found"));
+
+        User technician = userRepository.findById(technicianId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Technician not found"));
+
+        if (!technician.getRoles().contains(Role.TECHNICIAN)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User is not a technician");
+        }
+
+        ticket.setAssignedTechnician(technician);
+        return TicketResponse.from(ticketRepository.save(ticket));
     }
 
     public void deleteTicket(UUID id, String requesterEmail) {

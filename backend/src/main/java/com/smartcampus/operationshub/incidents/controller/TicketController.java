@@ -2,6 +2,7 @@ package com.smartcampus.operationshub.incidents.controller;
 
 import com.smartcampus.operationshub.incidents.dto.CreateTicketRequest;
 import com.smartcampus.operationshub.incidents.dto.TicketResponse;
+import com.smartcampus.operationshub.incidents.dto.UpdateTicketRequest;
 import com.smartcampus.operationshub.incidents.service.TicketService;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -13,10 +14,12 @@ import org.springframework.security.core.annotation.CurrentSecurityContext;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -55,6 +58,22 @@ public class TicketController {
     @GetMapping("/{id}")
     public ResponseEntity<TicketResponse> getTicketById(@PathVariable UUID id) {
         return ResponseEntity.ok(ticketService.getTicketById(id));
+    }
+
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<TicketResponse> updateStatus(
+            @PathVariable UUID id,
+            @Valid @RequestBody UpdateTicketRequest request) {
+
+        return ResponseEntity.ok(ticketService.updateStatus(id, request));
+    }
+
+    @PatchMapping("/{id}/assign")
+    public ResponseEntity<TicketResponse> assignTechnician(
+            @PathVariable UUID id,
+            @RequestParam UUID technicianId) {
+
+        return ResponseEntity.ok(ticketService.assignTechnician(id, technicianId));
     }
 
     @DeleteMapping("/{id}")
