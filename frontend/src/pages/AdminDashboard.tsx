@@ -6,6 +6,7 @@ import {
   Settings,
   BarChart3,
   ShieldCheck,
+  CalendarCheck,
   ChevronRight,
   Search,
   MoreVertical,
@@ -21,6 +22,7 @@ import {
   Building2
 } from "lucide-react"
 import AdminFacilitiesPanel from "@/pages/AdminFacilitiesPanel"
+import AdminBookingsPage from "@/pages/bookings/AdminBookingsPage"
 
 // --- Types ---
 interface User {
@@ -272,7 +274,7 @@ function NotificationsCenter() {
         <p className="text-white/60 font-medium max-w-sm">Real-time telemetry and identity lifecycle events requiring administrative oversight.</p>
       </div>
 
-      <div className="grid gap-4">
+      <div className="grid gap-4 max-h-[calc(100vh-280px)] overflow-y-auto pr-4 custom-scrollbar">
         {loading ? (
           <div className="p-20 text-center text-white/10 font-black uppercase tracking-widest border border-white/5 rounded-[40px]">Syncing Telemetry...</div>
         ) : notifications.length === 0 ? (
@@ -418,6 +420,7 @@ export default function AdminDashboard() {
         <nav className="flex-1 px-6 space-y-3 overflow-y-auto custom-scrollbar">
           <p className="text-[9px] font-black text-white/40 uppercase tracking-[.4em] px-4 mb-4">Core Governance</p>
           <NavItem icon={Users} label="User Management" active={activeTab === "users"} onClick={() => setActiveTab("users")} badge="Active" />
+          <NavItem icon={CalendarCheck} label="Bookings" active={activeTab === "bookings"} onClick={() => setActiveTab("bookings")} />
           <NavItem icon={Building2} label="Facilities" active={activeTab === "facilities"} onClick={() => setActiveTab("facilities")} />
           <NavItem icon={BellRing} label="Audit Alerts" active={activeTab === "notifications"} onClick={() => setActiveTab("notifications")} badge={stats.pendingApprovalCount > 0 ? stats.pendingApprovalCount.toString() : undefined} />
           
@@ -452,7 +455,7 @@ export default function AdminDashboard() {
             <div className="flex items-center gap-3 text-white/50 text-[10px] font-black uppercase tracking-widest">
               <span>Admin</span>
               <ChevronRight className="h-3 w-3" />
-              <span className="text-white">{activeTab === 'users' ? 'Identity Governance' : activeTab === 'facilities' ? 'Facility Registry' : activeTab === 'notifications' ? 'Audit Alerts' : activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}</span>
+              <span className="text-white">{activeTab === 'users' ? 'Identity Governance' : activeTab === 'bookings' ? 'Booking Governance' : activeTab === 'facilities' ? 'Facility Registry' : activeTab === 'notifications' ? 'Audit Alerts' : activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}</span>
             </div>
             <div className="flex items-center gap-6">
               <button 
@@ -482,6 +485,7 @@ export default function AdminDashboard() {
           {/* Dynamic Content */}
           <div className="relative">
             {activeTab === "users" && <UserManagement />}
+            {activeTab === "bookings" && <AdminBookingsPage />}
             {activeTab === "facilities" && <AdminFacilitiesPanel />}
             {activeTab === "notifications" && <NotificationsCenter />}
             {activeTab === "analytics" && <PlaceholderTab title="Neural Analytics" description="Advanced telemetry and system health indicators powered by behavioral patterns." icon={BarChart3} />}

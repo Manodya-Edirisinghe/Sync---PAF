@@ -1,4 +1,4 @@
-package com.smartcampus.operationshub.bookings.entity;
+package com.smartcampus.operationshub.bookings;
 
 public enum BookingStatus {
     PENDING,

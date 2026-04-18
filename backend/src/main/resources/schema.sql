@@ -1,1 +1,15 @@
 ALTER TABLE IF EXISTS users ADD COLUMN IF NOT EXISTS admin_protected BOOLEAN NOT NULL DEFAULT FALSE;
+
+CREATE TABLE IF NOT EXISTS bookings (
+	id BIGSERIAL PRIMARY KEY,
+	facility_id BIGINT NOT NULL,
+	user_email VARCHAR(255) NOT NULL,
+	start_time TIMESTAMP NOT NULL,
+	end_time TIMESTAMP NOT NULL,
+	status VARCHAR(50) NOT NULL DEFAULT 'PENDING',
+	purpose VARCHAR(500) NOT NULL,
+	attendees INTEGER,
+	rejection_reason TEXT,
+	created_at TIMESTAMP DEFAULT now(),
+	updated_at TIMESTAMP DEFAULT now()
+);

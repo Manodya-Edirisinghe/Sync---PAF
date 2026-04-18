@@ -1,6 +1,6 @@
 package com.smartcampus.operationshub.common.controller;
 
-import com.smartcampus.operationshub.bookings.entity.BookingStatus;
+import com.smartcampus.operationshub.bookings.BookingStatus;
 import com.smartcampus.operationshub.bookings.repository.BookingRepository;
 import com.smartcampus.operationshub.common.dto.StatsDTO;
 import com.smartcampus.operationshub.facilities.repository.FacilityRepository;

@@ -14,6 +14,9 @@ public class Notification {
     @Column(nullable = false)
     private String message;
 
+    @Column(name = "user_email")
+    private String userEmail;
+
     @Column(nullable = false)
     private String type; // e.g., "USER_REGISTRATION", "SYSTEM_ALERT"
 
@@ -32,9 +35,10 @@ public class Notification {
     public Notification() {}
 
     // All-Args Constructor
-    public Notification(Long id, String message, String type, LocalDateTime createdAt, boolean read) {
+    public Notification(Long id, String message, String userEmail, String type, LocalDateTime createdAt, boolean read) {
         this.id = id;
         this.message = message;
+        this.userEmail = userEmail;
         this.type = type;
         this.createdAt = createdAt;
         this.read = read;
@@ -46,6 +50,9 @@ public class Notification {
 
     public String getMessage() { return message; }
     public void setMessage(String message) { this.message = message; }
+
+    public String getUserEmail() { return userEmail; }
+    public void setUserEmail(String userEmail) { this.userEmail = userEmail; }
 
     public String getType() { return type; }
     public void setType(String type) { this.type = type; }
@@ -64,18 +71,20 @@ public class Notification {
     public static class NotificationBuilder {
         private Long id;
         private String message;
+        private String userEmail;
         private String type;
         private LocalDateTime createdAt;
         private boolean read;
 
         public NotificationBuilder id(Long id) { this.id = id; return this; }
         public NotificationBuilder message(String message) { this.message = message; return this; }
+        public NotificationBuilder userEmail(String userEmail) { this.userEmail = userEmail; return this; }
         public NotificationBuilder type(String type) { this.type = type; return this; }
         public NotificationBuilder createdAt(LocalDateTime createdAt) { this.createdAt = createdAt; return this; }
         public NotificationBuilder read(boolean read) { this.read = read; return this; }
 
         public Notification build() {
-            return new Notification(id, message, type, createdAt, read);
+            return new Notification(id, message, userEmail, type, createdAt, read);
         }
     }
 }
