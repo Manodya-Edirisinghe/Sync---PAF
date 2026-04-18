@@ -9,6 +9,9 @@ import FacilityDetailPage from "@/pages/FacilityDetailPage"
 import OAuthCallback from "@/pages/OAuthCallback"
 import MyBookingsPage from "@/pages/bookings/MyBookingsPage"
 import NewBookingPage from "@/pages/bookings/NewBookingPage"
+import IncidentPage from "@/pages/incidents/IncidentPage"
+import NewIncidentPage from "@/pages/incidents/NewIncidentPage"
+import IncidentDetailPage from "@/pages/incidents/IncidentDetailPage"
 
 function App() {
   return (
@@ -65,6 +68,11 @@ function App() {
               </ProtectedRoute>
             }
           />
+
+          {/* Incident routes */}
+          <Route path="/incidents" element={<ProtectedRoute><IncidentPage /></ProtectedRoute>} />
+          <Route path="/incidents/new" element={<ProtectedRoute><NewIncidentPage /></ProtectedRoute>} />
+          <Route path="/incidents/:id" element={<ProtectedRoute><IncidentDetailPage /></ProtectedRoute>} />
 
           {/* Admin routes */}
           <Route

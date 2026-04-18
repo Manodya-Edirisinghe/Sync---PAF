@@ -60,6 +60,13 @@ public class TicketService {
                 .toList();
     }
 
+    public List<TicketResponse> getAssignedTickets(String technicianEmail) {
+        return ticketRepository.findByAssignedTechnicianEmail(technicianEmail)
+                .stream()
+                .map(TicketResponse::from)
+                .toList();
+    }
+
     public TicketResponse getTicketById(UUID id) {
         return ticketRepository.findById(id)
                 .map(TicketResponse::from)
@@ -76,6 +83,9 @@ public class TicketService {
 
         ticket.setStatus(request.status());
         ticket.setRejectionReason(request.rejectionReason());
+        if (request.resolutionNotes() != null) {
+            ticket.setResolutionNotes(request.resolutionNotes());
+        }
 
         return TicketResponse.from(ticketRepository.save(ticket));
     }
