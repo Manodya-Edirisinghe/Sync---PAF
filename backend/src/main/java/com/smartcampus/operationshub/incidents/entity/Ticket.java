@@ -71,6 +71,9 @@ public class Ticket {
 
     private String rejectionReason;
 
+    @Column(length = 2000)
+    private String resolutionNotes;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private TicketStatus status;

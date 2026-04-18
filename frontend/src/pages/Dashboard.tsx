@@ -39,7 +39,7 @@ const QUICK_ACTIONS = [
     border: "border-orange-500/20",
     iconColor: "text-orange-400",
     shadow: "shadow-orange-500/10",
-    href: "",
+    href: "/incidents",
   },
   {
     icon: Building2,
