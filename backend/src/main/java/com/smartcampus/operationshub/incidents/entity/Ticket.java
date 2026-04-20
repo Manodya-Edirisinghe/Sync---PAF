@@ -4,6 +4,7 @@ import com.smartcampus.operationshub.users.entity.User;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
@@ -55,11 +56,23 @@ public class Ticket {
     @Column(nullable = false)
     private TicketPriority priority;
 
+    @Column(nullable = false)
+    private String preferredContact;
+
     @Builder.Default
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "ticket_attachments", joinColumns = @JoinColumn(name = "ticket_id"))
     @Column(name = "attachment_url", nullable = false, length = 2048)
     private Set<String> attachmentUrls = new HashSet<>();
+
+    @ManyToOne
+    @JoinColumn(name = "assigned_technician_id")
+    private User assignedTechnician;
+
+    private String rejectionReason;
+
+    @Column(length = 2000)
+    private String resolutionNotes;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

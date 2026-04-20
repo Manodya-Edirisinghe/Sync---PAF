@@ -19,7 +19,8 @@ import {
   Trash2,
   BellRing,
   Lock,
-  Building2
+  Building2,
+  AlertTriangle
 } from "lucide-react"
 import AdminFacilitiesPanel from "@/pages/AdminFacilitiesPanel"
 import AdminBookingsPage from "@/pages/bookings/AdminBookingsPage"
@@ -352,6 +353,216 @@ function PlaceholderTab({ title, description, icon: Icon }: PlaceholderTabProps)
   )
 }
 
+const TICKET_STATUSES = ["OPEN", "IN_PROGRESS", "RESOLVED", "CLOSED"]
+
+const PRIORITY_COLOR: Record<string, string> = {
+  LOW: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20",
+  MEDIUM: "text-yellow-400 bg-yellow-500/10 border-yellow-500/20",
+  HIGH: "text-orange-400 bg-orange-500/10 border-orange-500/20",
+  CRITICAL: "text-red-400 bg-red-500/10 border-red-500/20",
+}
+
+const STATUS_COLOR: Record<string, string> = {
+  OPEN: "text-blue-400 bg-blue-500/10 border-blue-500/20",
+  IN_PROGRESS: "text-yellow-400 bg-yellow-500/10 border-yellow-500/20",
+  RESOLVED: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20",
+  CLOSED: "text-white/40 bg-white/5 border-white/10",
+  REJECTED: "text-red-400 bg-red-500/10 border-red-500/20",
+}
+
+interface Ticket {
+  id: string
+  reporterName: string
+  reporterEmail: string
+  category: string
+  description: string
+  priority: string
+  status: string
+  assignedTechnicianName: string | null
+  rejectionReason: string | null
+  createdAt: string
+}
+
+interface Technician {
+  id: string
+  displayName: string
+  email: string
+  roles: string[]
+}
+
+function AdminTicketsPanel() {
+  const [tickets, setTickets] = useState<Ticket[]>([])
+  const [technicians, setTechnicians] = useState<Technician[]>([])
+  const [loading, setLoading] = useState(true)
+  const [rejectingId, setRejectingId] = useState<string | null>(null)
+  const [rejectionReason, setRejectionReason] = useState("")
+
+  const fetchTickets = async () => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/v1/tickets`, { credentials: "include" })
+      if (res.ok) {
+        const data = await res.json() as Ticket[]
+        setTickets(data)
+      }
+    } catch (err: unknown) {
+      console.error("Fetch tickets failed:", err instanceof Error ? err.message : String(err))
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const fetchTechnicians = async () => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/admin/users`, { credentials: "include" })
+      if (res.ok) {
+        const data = await res.json() as Technician[]
+        setTechnicians(data.filter(u => u.roles.includes("TECHNICIAN")))
+      }
+    } catch (err: unknown) {
+      console.error("Fetch technicians failed:", err instanceof Error ? err.message : String(err))
+    }
+  }
+
+  const updateStatus = async (id: string, status: string, reason?: string) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/v1/tickets/${id}/status`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ status, rejectionReason: reason ?? null }),
+      })
+      if (res.ok) {
+        fetchTickets()
+        setRejectingId(null)
+        setRejectionReason("")
+      }
+    } catch (err: unknown) {
+      console.error("Update status failed:", err instanceof Error ? err.message : String(err))
+    }
+  }
+
+  const assignTechnician = async (ticketId: string, technicianId: string) => {
+    if (!technicianId) return
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/v1/tickets/${ticketId}/assign?technicianId=${technicianId}`, {
+        method: "PATCH",
+        credentials: "include",
+      })
+      if (res.ok) fetchTickets()
+    } catch (err: unknown) {
+      console.error("Assign technician failed:", err instanceof Error ? err.message : String(err))
+    }
+  }
+
+  useEffect(() => { fetchTickets(); fetchTechnicians() }, [])
+
+  return (
+    <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <div className="space-y-3">
+        <h2 className="text-4xl font-black text-white tracking-tighter uppercase leading-none">Incident Tickets</h2>
+        <p className="text-white/60 font-medium max-w-md">Review and manage all submitted incident reports. Update workflow status and reject with reason.</p>
+      </div>
+
+      {loading ? (
+        <div className="p-20 text-center text-white/10 font-black uppercase tracking-widest border border-white/5 rounded-[40px]">Loading tickets...</div>
+      ) : tickets.length === 0 ? (
+        <div className="p-20 text-center text-white/10 font-black uppercase tracking-widest border border-white/5 rounded-[40px]">No tickets found</div>
+      ) : (
+        <div className="space-y-4">
+          {tickets.map(ticket => (
+            <div key={ticket.id} className="rounded-2xl border border-white/10 bg-white/[0.02] p-6 space-y-4 hover:bg-white/[0.04] transition-all">
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex-1 min-w-0 space-y-2">
+                  <div className="flex items-center gap-3 flex-wrap">
+                    <span className="font-black text-white uppercase tracking-tight">{ticket.category}</span>
+                    <span className={`text-[10px] px-2.5 py-1 rounded-full font-black uppercase tracking-widest border ${PRIORITY_COLOR[ticket.priority]}`}>
+                      {ticket.priority}
+                    </span>
+                    <span className={`text-[10px] px-2.5 py-1 rounded-full font-black uppercase tracking-widest border ${STATUS_COLOR[ticket.status]}`}>
+                      {ticket.status.replace("_", " ")}
+                    </span>
+                  </div>
+                  <p className="text-white/60 text-sm line-clamp-2">{ticket.description}</p>
+                  <p className="text-white/30 text-xs font-bold uppercase tracking-widest">
+                    Reported by {ticket.reporterName} · {new Date(ticket.createdAt).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}
+                  </p>
+                  {ticket.assignedTechnicianName && (
+                    <p className="text-white/30 text-xs font-bold uppercase tracking-widest">
+                      Assigned to {ticket.assignedTechnicianName}
+                    </p>
+                  )}
+                  {ticket.rejectionReason && (
+                    <p className="text-red-400 text-xs font-bold">Rejection: {ticket.rejectionReason}</p>
+                  )}
+                </div>
+
+                {/* Status Controls */}
+                <div className="flex flex-col gap-2 shrink-0">
+                  <select
+                    value={ticket.status}
+                    onChange={e => {
+                      const val = e.target.value
+                      if (val === "REJECTED") {
+                        setRejectingId(ticket.id)
+                      } else {
+                        updateStatus(ticket.id, val)
+                      }
+                    }}
+                    className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white text-xs font-black uppercase focus:outline-none focus:border-indigo-500/50 transition-all"
+                  >
+                    {TICKET_STATUSES.map(s => (
+                      <option key={s} value={s} className="bg-[#1a1a1a]">{s.replace("_", " ")}</option>
+                    ))}
+                    <option value="REJECTED" className="bg-[#1a1a1a]">REJECTED</option>
+                  </select>
+
+                  <select
+                    defaultValue=""
+                    onChange={e => assignTechnician(ticket.id, e.target.value)}
+                    className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white text-xs font-black focus:outline-none focus:border-indigo-500/50 transition-all"
+                  >
+                    <option value="" disabled className="bg-[#1a1a1a] text-white/40">
+                      {ticket.assignedTechnicianName ? `Assigned: ${ticket.assignedTechnicianName}` : "Assign Technician"}
+                    </option>
+                    {technicians.map(t => (
+                      <option key={t.id} value={t.id} className="bg-[#1a1a1a]">{t.displayName}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Rejection Reason Input */}
+              {rejectingId === ticket.id && (
+                <div className="flex gap-3 pt-2 border-t border-white/5">
+                  <input
+                    value={rejectionReason}
+                    onChange={e => setRejectionReason(e.target.value)}
+                    placeholder="Enter rejection reason..."
+                    className="flex-1 bg-white/5 border border-red-500/20 rounded-xl px-4 py-2 text-white text-sm focus:outline-none focus:border-red-500/50 placeholder-white/20"
+                  />
+                  <button
+                    onClick={() => updateStatus(ticket.id, "REJECTED", rejectionReason)}
+                    disabled={!rejectionReason.trim()}
+                    className="px-4 py-2 bg-red-500/20 border border-red-500/30 text-red-400 rounded-xl text-xs font-black uppercase disabled:opacity-50 hover:bg-red-500/30 transition-all"
+                  >
+                    Confirm
+                  </button>
+                  <button
+                    onClick={() => { setRejectingId(null); setRejectionReason("") }}
+                    className="px-4 py-2 bg-white/5 border border-white/10 text-white/40 rounded-xl text-xs font-black uppercase hover:bg-white/10 transition-all"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function AdminDashboard() {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
@@ -423,6 +634,7 @@ export default function AdminDashboard() {
           <NavItem icon={CalendarCheck} label="Bookings" active={activeTab === "bookings"} onClick={() => setActiveTab("bookings")} />
           <NavItem icon={Building2} label="Facilities" active={activeTab === "facilities"} onClick={() => setActiveTab("facilities")} />
           <NavItem icon={BellRing} label="Audit Alerts" active={activeTab === "notifications"} onClick={() => setActiveTab("notifications")} badge={stats.pendingApprovalCount > 0 ? stats.pendingApprovalCount.toString() : undefined} />
+          <NavItem icon={AlertTriangle} label="Tickets" active={activeTab === "tickets"} onClick={() => setActiveTab("tickets")} />
           
           <div className="py-8" />
           
@@ -455,7 +667,7 @@ export default function AdminDashboard() {
             <div className="flex items-center gap-3 text-white/50 text-[10px] font-black uppercase tracking-widest">
               <span>Admin</span>
               <ChevronRight className="h-3 w-3" />
-              <span className="text-white">{activeTab === 'users' ? 'Identity Governance' : activeTab === 'bookings' ? 'Booking Governance' : activeTab === 'facilities' ? 'Facility Registry' : activeTab === 'notifications' ? 'Audit Alerts' : activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}</span>
+              <span className="text-white">{activeTab === 'users' ? 'Identity Governance' : activeTab === 'bookings' ? 'Booking Governance' : activeTab === 'facilities' ? 'Facility Registry' : activeTab === 'notifications' ? 'Audit Alerts' : activeTab === 'tickets' ? 'Incident Tickets' : activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}</span>
             </div>
             <div className="flex items-center gap-6">
               <button 
@@ -488,6 +700,7 @@ export default function AdminDashboard() {
             {activeTab === "bookings" && <AdminBookingsPage />}
             {activeTab === "facilities" && <AdminFacilitiesPanel />}
             {activeTab === "notifications" && <NotificationsCenter />}
+            {activeTab === "tickets" && <AdminTicketsPanel />}
             {activeTab === "analytics" && <PlaceholderTab title="Neural Analytics" description="Advanced telemetry and system health indicators powered by behavioral patterns." icon={BarChart3} />}
             {activeTab === "settings" && <PlaceholderTab title="System Architecture" description="Global configuration matrices and secure environment variables management." icon={Settings} />}
           </div>
