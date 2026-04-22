@@ -1,16 +1,10 @@
 package com.smartcampus.operationshub.users.service;
 
-import java.util.Objects;
-import com.smartcampus.operationshub.common.entity.Notification;
-import com.smartcampus.operationshub.common.repository.NotificationRepository;
-import com.smartcampus.operationshub.users.entity.Role;
-import com.smartcampus.operationshub.users.entity.User;
-import com.smartcampus.operationshub.users.repository.UserRepository;
-
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -31,6 +25,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import com.smartcampus.operationshub.common.entity.Notification;
+import com.smartcampus.operationshub.common.repository.NotificationRepository;
+import com.smartcampus.operationshub.users.entity.Role;
+import com.smartcampus.operationshub.users.entity.User;
+import com.smartcampus.operationshub.users.repository.UserRepository;
+
 /**
  * Loads the Google OAuth2 user, persists/updates the record in Neon PostgreSQL,
  * and returns a custom {@link OAuth2User} whose {@link GrantedAuthority} list
@@ -50,7 +50,7 @@ public class PersistingOAuth2UserService implements OAuth2UserService<OAuth2User
 
     public PersistingOAuth2UserService(UserRepository userRepository, 
                                       NotificationRepository notificationRepository,
-                                      @Value("${app.owner-email}") String ownerEmail) {
+                                      @Value("${custom.app.owner-email}") String ownerEmail) {
         this.userRepository = userRepository;
         this.notificationRepository = notificationRepository;
         this.delegate = new DefaultOAuth2UserService();

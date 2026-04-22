@@ -1,5 +1,12 @@
 package com.smartcampus.operationshub.facilities.service;
 
+import java.util.List;
+import java.util.Objects;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+
 import com.smartcampus.operationshub.common.entity.Notification;
 import com.smartcampus.operationshub.common.repository.NotificationRepository;
 import com.smartcampus.operationshub.facilities.dto.FacilityRequestDto;
@@ -9,11 +16,6 @@ import com.smartcampus.operationshub.facilities.entity.FacilityStatus;
 import com.smartcampus.operationshub.facilities.entity.FacilityType;
 import com.smartcampus.operationshub.facilities.exception.FacilityNotFoundException;
 import com.smartcampus.operationshub.facilities.repository.FacilityRepository;
-import java.util.List;
-import java.util.Objects;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 @Service
 @Transactional
@@ -55,6 +57,7 @@ public class FacilityServiceImpl implements FacilityService {
     }
 
     @Override
+    @SuppressWarnings("null")
     public FacilityResponseDto createFacility(FacilityRequestDto dto) {
         Facility facility = new Facility();
         applyDto(facility, dto);
@@ -74,6 +77,7 @@ public class FacilityServiceImpl implements FacilityService {
     }
 
     @Override
+    @SuppressWarnings("null")
     public FacilityResponseDto updateFacility(Long id, FacilityRequestDto dto) {
         Facility facility = findOrThrow(id);
         applyDto(facility, dto);
@@ -89,6 +93,7 @@ public class FacilityServiceImpl implements FacilityService {
     }
 
     @Override
+    @SuppressWarnings("null")
     public FacilityResponseDto updateFacilityStatus(Long id, FacilityStatus status) {
         Facility facility = findOrThrow(id);
         facility.setStatus(status);
@@ -105,6 +110,7 @@ public class FacilityServiceImpl implements FacilityService {
     }
 
     @Override
+    @SuppressWarnings("null")
     public void deleteFacility(Long id) {
         Facility facility = findOrThrow(id);
         facilityRepository.delete(facility);

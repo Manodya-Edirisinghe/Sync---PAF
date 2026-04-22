@@ -1,5 +1,12 @@
 package com.smartcampus.operationshub.incidents.service;
 
+import java.util.List;
+import java.util.UUID;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+
 import com.smartcampus.operationshub.incidents.dto.CommentResponse;
 import com.smartcampus.operationshub.incidents.dto.CreateCommentRequest;
 import com.smartcampus.operationshub.incidents.entity.Comment;
@@ -8,11 +15,6 @@ import com.smartcampus.operationshub.incidents.repository.CommentRepository;
 import com.smartcampus.operationshub.incidents.repository.TicketRepository;
 import com.smartcampus.operationshub.users.entity.User;
 import com.smartcampus.operationshub.users.repository.UserRepository;
-import java.util.List;
-import java.util.UUID;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class CommentService {
@@ -27,6 +29,7 @@ public class CommentService {
         this.userRepository = userRepository;
     }
 
+    @SuppressWarnings("null")
     public CommentResponse addComment(UUID ticketId, CreateCommentRequest request, String authorEmail) {
         Ticket ticket = ticketRepository.findById(ticketId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ticket not found"));
@@ -43,6 +46,7 @@ public class CommentService {
         return CommentResponse.from(commentRepository.save(comment));
     }
 
+    @SuppressWarnings("null")
     public List<CommentResponse> getComments(UUID ticketId) {
         if (!ticketRepository.existsById(ticketId)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Ticket not found");
@@ -53,6 +57,7 @@ public class CommentService {
                 .toList();
     }
 
+    @SuppressWarnings("null")
     public CommentResponse editComment(UUID ticketId, UUID commentId, CreateCommentRequest request, String requesterEmail) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Comment not found"));
@@ -69,6 +74,7 @@ public class CommentService {
         return CommentResponse.from(commentRepository.save(comment));
     }
 
+    @SuppressWarnings("null")
     public void deleteComment(UUID ticketId, UUID commentId, String requesterEmail) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Comment not found"));
