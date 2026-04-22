@@ -1,5 +1,14 @@
 package com.smartcampus.operationshub.bookings.service.impl;
 
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Objects;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.smartcampus.operationshub.bookings.BookingStatus;
 import com.smartcampus.operationshub.bookings.dto.BookingRequest;
 import com.smartcampus.operationshub.bookings.dto.BookingResponse;
@@ -14,13 +23,6 @@ import com.smartcampus.operationshub.facilities.entity.Facility;
 import com.smartcampus.operationshub.facilities.entity.FacilityStatus;
 import com.smartcampus.operationshub.facilities.exception.ResourceNotFoundException;
 import com.smartcampus.operationshub.facilities.repository.FacilityRepository;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Objects;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
@@ -201,6 +203,7 @@ public class BookingServiceImpl implements BookingService {
         return userEmail.trim().toLowerCase();
     }
 
+    @SuppressWarnings("null")
     private void saveNotification(String userEmail, String message) {
         Notification notification = Notification.builder()
                 .userEmail(userEmail)
@@ -216,6 +219,7 @@ public class BookingServiceImpl implements BookingService {
         }
     }
 
+    @SuppressWarnings("null")
     private String resolveFacilityName(Long facilityId) {
         return facilityRepository.findById(facilityId)
                 .map(Facility::getName)
