@@ -14,6 +14,7 @@ import org.springframework.security.core.annotation.CurrentSecurityContext;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -99,6 +100,20 @@ public class UserController {
             User updatedUser = userRepository.save(user);
             System.out.println("### UPDATED ROLES for " + user.getEmail() + " to " + newRoles + " ###");
             return ResponseEntity.ok(toDto(updatedUser));
+        }).orElse(ResponseEntity.status(404).body(Map.of("error", "User not found")));
+    }
+
+    /**
+     * Admin-only: delete a user.
+     */
+    @DeleteMapping("/admin/users/{id}")
+    public ResponseEntity<?> deleteUser(@PathVariable UUID id) {
+        return userRepository.findById(id).map(user -> {
+            if (user.isAdminProtected()) {
+                return ResponseEntity.status(403).body(Map.of("error", "This administrative account is protected and cannot be deleted."));
+            }
+            userRepository.delete(user);
+            return ResponseEntity.ok(Map.of("message", "User deleted successfully"));
         }).orElse(ResponseEntity.status(404).body(Map.of("error", "User not found")));
     }
 
