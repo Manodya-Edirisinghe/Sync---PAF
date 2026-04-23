@@ -24,6 +24,8 @@ import {
 } from "lucide-react"
 import AdminFacilitiesPanel from "@/pages/AdminFacilitiesPanel"
 import AdminBookingsPage from "@/pages/bookings/AdminBookingsPage"
+import AdminAnalyticsPanel from "@/pages/AdminAnalyticsPanel"
+import AdminSettingsPanel from "@/pages/AdminSettingsPanel"
 
 // --- Types ---
 interface User {
@@ -83,6 +85,7 @@ function UserManagement() {
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState("")
+  const [openDropdown, setOpenDropdown] = useState<string | number | null>(null)
 
   const fetchUsers = async () => {
     try {
@@ -112,6 +115,24 @@ function UserManagement() {
       console.error("Update role failed:", err instanceof Error ? err.message : String(err))
     }
   }
+
+  const deleteUser = async (userId: number | string) => {
+    if (!window.confirm("Are you sure you want to remove this user?")) return;
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/admin/users/${userId}`, {
+        method: "DELETE",
+        credentials: "include"
+      });
+      if (res.ok) {
+        fetchUsers();
+        setOpenDropdown(null);
+      } else {
+        console.error("Failed to delete user");
+      }
+    } catch (err: unknown) {
+      console.error("Delete user failed:", err instanceof Error ? err.message : String(err));
+    }
+  };
 
   useEffect(() => { fetchUsers() }, [])
 
@@ -210,9 +231,49 @@ function UserManagement() {
                     >
                       {u.roles.includes('ADMIN') ? 'Revoke Admin' : 'Grant Admin'}
                     </button>
-                    <button className="p-3 rounded-xl border border-white/5 hover:bg-white/10 text-white/50 hover:text-white transition-all">
-                      <MoreVertical className="h-5 w-5" />
-                    </button>
+                    <div className="relative">
+                      <button 
+                        onClick={() => setOpenDropdown(openDropdown === u.id ? null : u.id)}
+                        className="p-3 rounded-xl border border-white/5 hover:bg-white/10 text-white/50 hover:text-white transition-all"
+                      >
+                        <MoreVertical className="h-5 w-5" />
+                      </button>
+                      {openDropdown === u.id && (
+                        <>
+                          {/* Invisible backdrop to close dropdown when clicking outside */}
+                          <div 
+                            className="fixed inset-0 z-10" 
+                            onClick={() => setOpenDropdown(null)} 
+                          />
+                          
+                          <div className="absolute right-0 top-full mt-3 w-64 bg-[#0a0a0a]/90 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.8)] p-2 z-20 animate-in fade-in zoom-in-95 slide-in-from-top-2 duration-200 origin-top-right">
+                            <div className="px-3 py-2.5 mb-1 border-b border-white/5 flex items-center justify-between">
+                              <p className="text-[10px] font-black tracking-widest uppercase text-white/40">User Actions</p>
+                              {u.adminProtected && <Lock className="h-3 w-3 text-white/20" />}
+                            </div>
+                            
+                            <button 
+                              onClick={() => {
+                                deleteUser(u.id);
+                                setOpenDropdown(null);
+                              }}
+                              disabled={u.adminProtected}
+                              className="group w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold text-red-400 hover:bg-red-500/10 hover:text-red-300 disabled:opacity-40 disabled:hover:bg-transparent disabled:cursor-not-allowed transition-all"
+                            >
+                              <div className="h-8 w-8 rounded-lg bg-red-500/10 text-red-400 group-hover:bg-red-500 group-hover:text-white group-disabled:bg-white/5 group-disabled:text-white/20 flex items-center justify-center transition-all shrink-0">
+                                <Trash2 className="h-4 w-4" />
+                              </div>
+                              <div className="flex flex-col items-start leading-tight text-left">
+                                <span>{u.adminProtected ? 'Protected User' : 'Remove Identity'}</span>
+                                <span className="text-[10px] font-medium text-red-400/60 group-hover:text-red-300/80 group-disabled:text-white/30">
+                                  {u.adminProtected ? 'Cannot be deleted' : 'Irreversible permanent action'}
+                                </span>
+                              </div>
+                            </button>
+                          </div>
+                        </>
+                      )}
+                    </div>
                   </div>
                 </td>
               </tr>
@@ -266,13 +327,36 @@ function NotificationsCenter() {
     }
   }
 
+  const deleteAllNotifications = async () => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/notifications/all`, {
+        method: "DELETE",
+        credentials: "include"
+      })
+      if (res.ok) fetchNotifications()
+    } catch (err: unknown) {
+      console.error("Delete all notifications failed:", err instanceof Error ? err.message : String(err))
+    }
+  }
+
   useEffect(() => { fetchNotifications() }, [])
 
   return (
     <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      <div className="space-y-3">
-        <h2 className="text-4xl font-black text-white tracking-tighter uppercase leading-none">Security Audit Alerts</h2>
-        <p className="text-white/60 font-medium max-w-sm">Real-time telemetry and identity lifecycle events requiring administrative oversight.</p>
+      <div className="flex items-start justify-between">
+        <div className="space-y-3">
+          <h2 className="text-4xl font-black text-white tracking-tighter uppercase leading-none">Security Audit Alerts</h2>
+          <p className="text-white/60 font-medium max-w-sm">Real-time telemetry and identity lifecycle events requiring administrative oversight.</p>
+        </div>
+        {notifications.length > 0 && (
+          <button 
+            onClick={deleteAllNotifications}
+            className="flex items-center gap-2 px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 rounded-xl font-bold uppercase tracking-widest text-xs transition-all shrink-0"
+          >
+            <Trash2 className="h-4 w-4" />
+            Clear All Alerts
+          </button>
+        )}
       </div>
 
       <div className="grid gap-4 max-h-[calc(100vh-280px)] overflow-y-auto pr-4 custom-scrollbar">
@@ -331,27 +415,6 @@ function NotificationsCenter() {
   )
 }
 
-interface PlaceholderTabProps {
-  title: string;
-  description: string;
-  icon: ElementType;
-}
-
-function PlaceholderTab({ title, description, icon: Icon }: PlaceholderTabProps) {
-  return (
-    <div className="flex flex-col items-center justify-center shrink-0 h-[600px] rounded-[40px] border border-white/5 bg-white/[0.01] animate-in fade-in zoom-in duration-500">
-       <div className="p-10 rounded-full bg-indigo-500/5 border border-indigo-500/10 mb-8">
-          <Icon className="h-20 w-20 text-indigo-500/30" />
-       </div>
-       <h3 className="text-3xl font-black text-white tracking-tight uppercase mb-4">{title}</h3>
-       <p className="text-white/50 text-lg max-w-sm text-center font-medium">{description}</p>
-       <button className="mt-10 flex items-center gap-3 text-sm font-black text-indigo-400 uppercase tracking-widest hover:text-indigo-300 transition-all">
-         <span>Initialize Integration</span>
-         <ChevronRight className="h-4 w-4" />
-       </button>
-    </div>
-  )
-}
 
 const TICKET_STATUSES = ["OPEN", "IN_PROGRESS", "RESOLVED", "CLOSED"]
 
@@ -701,8 +764,8 @@ export default function AdminDashboard() {
             {activeTab === "facilities" && <AdminFacilitiesPanel />}
             {activeTab === "notifications" && <NotificationsCenter />}
             {activeTab === "tickets" && <AdminTicketsPanel />}
-            {activeTab === "analytics" && <PlaceholderTab title="Neural Analytics" description="Advanced telemetry and system health indicators powered by behavioral patterns." icon={BarChart3} />}
-            {activeTab === "settings" && <PlaceholderTab title="System Architecture" description="Global configuration matrices and secure environment variables management." icon={Settings} />}
+            {activeTab === "analytics" && <AdminAnalyticsPanel />}
+            {activeTab === "settings" && <AdminSettingsPanel />}
           </div>
         </div>
       </main>

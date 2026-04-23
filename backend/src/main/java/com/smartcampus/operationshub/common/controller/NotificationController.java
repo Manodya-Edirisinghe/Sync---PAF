@@ -38,4 +38,10 @@ public class NotificationController {
         notificationRepository.deleteById(Objects.requireNonNull(id));
         return ResponseEntity.ok().build();
     }
+
+    @DeleteMapping("/all")
+    public ResponseEntity<Void> deleteAllNotifications() {
+        notificationRepository.deleteAll();
+        return ResponseEntity.ok().build();
+    }
 }
