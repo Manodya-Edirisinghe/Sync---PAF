@@ -68,28 +68,44 @@ export default function AdminAnalyticsPanel() {
       acc[t.status] = (acc[t.status] || 0) + 1
       return acc
     }, {} as Record<string, number>)
-    const ticketStatusData = Object.entries(ticketStatusCount).map(([name, value]) => ({ name, value }))
+    const ticketStatusData = Object.entries(ticketStatusCount).map(([name, value], index) => ({ 
+      name, 
+      value, 
+      fill: COLORS[index % COLORS.length] 
+    }))
 
     // Tickets by Category
     const ticketCategoryCount = tickets.reduce((acc, t) => {
       acc[t.category] = (acc[t.category] || 0) + 1
       return acc
     }, {} as Record<string, number>)
-    const ticketCategoryData = Object.entries(ticketCategoryCount).map(([name, value]) => ({ name, value }))
+    const ticketCategoryData = Object.entries(ticketCategoryCount).map(([name, value], index) => ({ 
+      name, 
+      value, 
+      fill: COLORS[(index + 1) % COLORS.length] 
+    }))
 
     // Facilities by Type
     const facilityTypeCount = facilities.reduce((acc, f) => {
       acc[f.type] = (acc[f.type] || 0) + 1
       return acc
     }, {} as Record<string, number>)
-    const facilityTypeData = Object.entries(facilityTypeCount).map(([name, value]) => ({ name: name.replace(/_/g, ' '), value }))
+    const facilityTypeData = Object.entries(facilityTypeCount).map(([name, value], index) => ({ 
+      name: name.replace(/_/g, ' '), 
+      value, 
+      fill: COLORS[(index + 3) % COLORS.length] 
+    }))
 
     // Bookings by Status
     const bookingStatusCount = bookings.reduce((acc, b) => {
       acc[b.status] = (acc[b.status] || 0) + 1
       return acc
     }, {} as Record<string, number>)
-    const bookingStatusData = Object.entries(bookingStatusCount).map(([name, value]) => ({ name, value }))
+    const bookingStatusData = Object.entries(bookingStatusCount).map(([name, value], index) => ({ 
+      name, 
+      value, 
+      fill: COLORS[index % COLORS.length] 
+    }))
 
     return { ticketStatusData, ticketCategoryData, facilityTypeData, bookingStatusData }
   }
@@ -97,12 +113,17 @@ export default function AdminAnalyticsPanel() {
   const { ticketStatusData, ticketCategoryData, facilityTypeData, bookingStatusData } = processData()
 
   // Custom Tooltip for dark mode
-  const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?: Array<{ name: string; value: number }>; label?: string }) => {
+  const CustomTooltip = ({ active, payload, label }: { 
+    active?: boolean; 
+    payload?: Array<{ name: string; value: number; fill?: string; color?: string; payload?: { fill?: string } }>; 
+    label?: string 
+  }) => {
     if (active && payload && payload.length) {
+      const color = payload[0].payload?.fill || payload[0].color || payload[0].fill || "#818cf8";
       return (
         <div className="bg-[#0a0a0a] border border-white/10 p-3 rounded-xl shadow-xl">
           <p className="text-white font-bold mb-1">{label || payload[0].name}</p>
-          <p className="text-indigo-400 font-medium">Count: {payload[0].value}</p>
+          <p className="font-medium" style={{ color }}>Count: {payload[0].value}</p>
         </div>
       )
     }

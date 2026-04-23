@@ -25,6 +25,7 @@ import {
 import AdminFacilitiesPanel from "@/pages/AdminFacilitiesPanel"
 import AdminBookingsPage from "@/pages/bookings/AdminBookingsPage"
 import AdminAnalyticsPanel from "@/pages/AdminAnalyticsPanel"
+import AdminSettingsPanel from "@/pages/AdminSettingsPanel"
 
 // --- Types ---
 interface User {
@@ -326,13 +327,36 @@ function NotificationsCenter() {
     }
   }
 
+  const deleteAllNotifications = async () => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/notifications/all`, {
+        method: "DELETE",
+        credentials: "include"
+      })
+      if (res.ok) fetchNotifications()
+    } catch (err: unknown) {
+      console.error("Delete all notifications failed:", err instanceof Error ? err.message : String(err))
+    }
+  }
+
   useEffect(() => { fetchNotifications() }, [])
 
   return (
     <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      <div className="space-y-3">
-        <h2 className="text-4xl font-black text-white tracking-tighter uppercase leading-none">Security Audit Alerts</h2>
-        <p className="text-white/60 font-medium max-w-sm">Real-time telemetry and identity lifecycle events requiring administrative oversight.</p>
+      <div className="flex items-start justify-between">
+        <div className="space-y-3">
+          <h2 className="text-4xl font-black text-white tracking-tighter uppercase leading-none">Security Audit Alerts</h2>
+          <p className="text-white/60 font-medium max-w-sm">Real-time telemetry and identity lifecycle events requiring administrative oversight.</p>
+        </div>
+        {notifications.length > 0 && (
+          <button 
+            onClick={deleteAllNotifications}
+            className="flex items-center gap-2 px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 rounded-xl font-bold uppercase tracking-widest text-xs transition-all shrink-0"
+          >
+            <Trash2 className="h-4 w-4" />
+            Clear All Alerts
+          </button>
+        )}
       </div>
 
       <div className="grid gap-4 max-h-[calc(100vh-280px)] overflow-y-auto pr-4 custom-scrollbar">
@@ -391,27 +415,6 @@ function NotificationsCenter() {
   )
 }
 
-interface PlaceholderTabProps {
-  title: string;
-  description: string;
-  icon: ElementType;
-}
-
-function PlaceholderTab({ title, description, icon: Icon }: PlaceholderTabProps) {
-  return (
-    <div className="flex flex-col items-center justify-center shrink-0 h-[600px] rounded-[40px] border border-white/5 bg-white/[0.01] animate-in fade-in zoom-in duration-500">
-       <div className="p-10 rounded-full bg-indigo-500/5 border border-indigo-500/10 mb-8">
-          <Icon className="h-20 w-20 text-indigo-500/30" />
-       </div>
-       <h3 className="text-3xl font-black text-white tracking-tight uppercase mb-4">{title}</h3>
-       <p className="text-white/50 text-lg max-w-sm text-center font-medium">{description}</p>
-       <button className="mt-10 flex items-center gap-3 text-sm font-black text-indigo-400 uppercase tracking-widest hover:text-indigo-300 transition-all">
-         <span>Initialize Integration</span>
-         <ChevronRight className="h-4 w-4" />
-       </button>
-    </div>
-  )
-}
 
 const TICKET_STATUSES = ["OPEN", "IN_PROGRESS", "RESOLVED", "CLOSED"]
 
@@ -762,7 +765,7 @@ export default function AdminDashboard() {
             {activeTab === "notifications" && <NotificationsCenter />}
             {activeTab === "tickets" && <AdminTicketsPanel />}
             {activeTab === "analytics" && <AdminAnalyticsPanel />}
-            {activeTab === "settings" && <PlaceholderTab title="System Architecture" description="Global configuration matrices and secure environment variables management." icon={Settings} />}
+            {activeTab === "settings" && <AdminSettingsPanel />}
           </div>
         </div>
       </main>
