@@ -24,6 +24,7 @@ import {
 } from "lucide-react"
 import AdminFacilitiesPanel from "@/pages/AdminFacilitiesPanel"
 import AdminBookingsPage from "@/pages/bookings/AdminBookingsPage"
+import AdminAnalyticsPanel from "@/pages/AdminAnalyticsPanel"
 
 // --- Types ---
 interface User {
@@ -760,7 +761,7 @@ export default function AdminDashboard() {
             {activeTab === "facilities" && <AdminFacilitiesPanel />}
             {activeTab === "notifications" && <NotificationsCenter />}
             {activeTab === "tickets" && <AdminTicketsPanel />}
-            {activeTab === "analytics" && <PlaceholderTab title="Neural Analytics" description="Advanced telemetry and system health indicators powered by behavioral patterns." icon={BarChart3} />}
+            {activeTab === "analytics" && <AdminAnalyticsPanel />}
             {activeTab === "settings" && <PlaceholderTab title="System Architecture" description="Global configuration matrices and secure environment variables management." icon={Settings} />}
           </div>
         </div>
