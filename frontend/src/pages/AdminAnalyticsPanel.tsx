@@ -172,7 +172,7 @@ export default function AdminAnalyticsPanel() {
                     dataKey="value"
                     stroke="none"
                   >
-                    {ticketStatusData.map((entry, index) => (
+                    {ticketStatusData.map((_, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
@@ -203,7 +203,7 @@ export default function AdminAnalyticsPanel() {
                   <YAxis stroke="#ffffff50" tick={{ fill: '#ffffff50', fontSize: 10, fontWeight: 'bold' }} axisLine={false} tickLine={false} allowDecimals={false} />
                   <Tooltip content={<CustomTooltip />} cursor={{ fill: '#ffffff05' }} />
                   <Bar dataKey="value" radius={[4, 4, 0, 0]}>
-                    {bookingStatusData.map((entry, index) => (
+                    {bookingStatusData.map((_, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Bar>
@@ -236,7 +236,7 @@ export default function AdminAnalyticsPanel() {
                     stroke="#0a0a0a"
                     strokeWidth={2}
                   >
-                    {facilityTypeData.map((entry, index) => (
+                    {facilityTypeData.map((_, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[(index + 3) % COLORS.length]} />
                     ))}
                   </Pie>
@@ -267,7 +267,7 @@ export default function AdminAnalyticsPanel() {
                   <YAxis dataKey="name" type="category" stroke="#ffffff50" tick={{ fill: '#ffffff50', fontSize: 10, fontWeight: 'bold' }} axisLine={false} tickLine={false} />
                   <Tooltip content={<CustomTooltip />} cursor={{ fill: '#ffffff05' }} />
                   <Bar dataKey="value" radius={[0, 4, 4, 0]}>
-                    {ticketCategoryData.map((entry, index) => (
+                    {ticketCategoryData.map((_, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[(index + 1) % COLORS.length]} />
                     ))}
                   </Bar>
