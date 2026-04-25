@@ -203,7 +203,6 @@ public class BookingServiceImpl implements BookingService {
         return userEmail.trim().toLowerCase();
     }
 
-    @SuppressWarnings("null")
     private void saveNotification(String userEmail, String message) {
         Notification notification = Notification.builder()
                 .userEmail(userEmail)
@@ -219,7 +218,6 @@ public class BookingServiceImpl implements BookingService {
         }
     }
 
-    @SuppressWarnings("null")
     private String resolveFacilityName(Long facilityId) {
         return facilityRepository.findById(facilityId)
                 .map(Facility::getName)

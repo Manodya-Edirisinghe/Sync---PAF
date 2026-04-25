@@ -29,7 +29,6 @@ public class CommentService {
         this.userRepository = userRepository;
     }
 
-    @SuppressWarnings("null")
     public CommentResponse addComment(UUID ticketId, CreateCommentRequest request, String authorEmail) {
         Ticket ticket = ticketRepository.findById(ticketId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ticket not found"));
@@ -46,7 +45,6 @@ public class CommentService {
         return CommentResponse.from(commentRepository.save(comment));
     }
 
-    @SuppressWarnings("null")
     public List<CommentResponse> getComments(UUID ticketId) {
         if (!ticketRepository.existsById(ticketId)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Ticket not found");
@@ -57,7 +55,6 @@ public class CommentService {
                 .toList();
     }
 
-    @SuppressWarnings("null")
     public CommentResponse editComment(UUID ticketId, UUID commentId, CreateCommentRequest request, String requesterEmail) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Comment not found"));
@@ -74,7 +71,6 @@ public class CommentService {
         return CommentResponse.from(commentRepository.save(comment));
     }
 
-    @SuppressWarnings("null")
     public void deleteComment(UUID ticketId, UUID commentId, String requesterEmail) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Comment not found"));
