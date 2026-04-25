@@ -28,7 +28,6 @@ public class TicketService {
         this.userRepository = userRepository;
     }
 
-    @SuppressWarnings("null")
     public TicketResponse createTicket(CreateTicketRequest request, String reporterEmail) {
         User reporter = userRepository.findByEmail(reporterEmail)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
@@ -53,7 +52,6 @@ public class TicketService {
                 .toList();
     }
 
-    @SuppressWarnings("null")
     public List<TicketResponse> getMyTickets(String reporterEmail) {
         User reporter = userRepository.findByEmail(reporterEmail)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
@@ -64,7 +62,6 @@ public class TicketService {
                 .toList();
     }
 
-    @SuppressWarnings("null")
     public List<TicketResponse> getAssignedTickets(String technicianEmail) {
         return ticketRepository.findByAssignedTechnicianEmail(technicianEmail)
                 .stream()
@@ -72,14 +69,12 @@ public class TicketService {
                 .toList();
     }
 
-    @SuppressWarnings("null")
     public TicketResponse getTicketById(UUID id) {
         return ticketRepository.findById(id)
                 .map(TicketResponse::from)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ticket not found"));
     }
 
-    @SuppressWarnings("null")
     public TicketResponse updateStatus(UUID id, UpdateTicketRequest request) {
         Ticket ticket = ticketRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ticket not found"));
@@ -97,7 +92,6 @@ public class TicketService {
         return TicketResponse.from(ticketRepository.save(ticket));
     }
 
-    @SuppressWarnings("null")
     public TicketResponse assignTechnician(UUID ticketId, UUID technicianId) {
         Ticket ticket = ticketRepository.findById(ticketId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ticket not found"));
@@ -113,7 +107,6 @@ public class TicketService {
         return TicketResponse.from(ticketRepository.save(ticket));
     }
 
-    @SuppressWarnings("null")
     public void deleteTicket(UUID id, String requesterEmail) {
         Ticket ticket = ticketRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ticket not found"));

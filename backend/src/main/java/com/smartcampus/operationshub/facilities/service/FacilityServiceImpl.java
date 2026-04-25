@@ -57,7 +57,6 @@ public class FacilityServiceImpl implements FacilityService {
     }
 
     @Override
-    @SuppressWarnings("null")
     public FacilityResponseDto createFacility(FacilityRequestDto dto) {
         Facility facility = new Facility();
         applyDto(facility, dto);
@@ -77,7 +76,6 @@ public class FacilityServiceImpl implements FacilityService {
     }
 
     @Override
-    @SuppressWarnings("null")
     public FacilityResponseDto updateFacility(Long id, FacilityRequestDto dto) {
         Facility facility = findOrThrow(id);
         applyDto(facility, dto);
@@ -93,7 +91,6 @@ public class FacilityServiceImpl implements FacilityService {
     }
 
     @Override
-    @SuppressWarnings("null")
     public FacilityResponseDto updateFacilityStatus(Long id, FacilityStatus status) {
         Facility facility = findOrThrow(id);
         facility.setStatus(status);
@@ -110,7 +107,6 @@ public class FacilityServiceImpl implements FacilityService {
     }
 
     @Override
-    @SuppressWarnings("null")
     public void deleteFacility(Long id) {
         Facility facility = findOrThrow(id);
         facilityRepository.delete(facility);
