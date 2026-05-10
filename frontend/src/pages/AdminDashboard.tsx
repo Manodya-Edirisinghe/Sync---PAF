@@ -678,9 +678,15 @@ export default function AdminDashboard() {
       {/* Sidebar */}
       <aside className="sticky top-0 h-screen w-80 shrink-0 border-r border-white/[0.05] flex flex-col z-20 overflow-hidden bg-black/40 backdrop-blur-3xl">
         <div className="p-10 pb-12">
-          <div className="py-2" />
-          
-          <div className="flex items-center gap-4 py-6 border-b border-white/[0.05]">
+          <div className="flex justify-start pt-2 pb-6">
+            <img
+              src="/KuppiLink.png"
+              alt="KuppiLink"
+              className="h-10 w-auto object-contain"
+            />
+          </div>
+
+          <div className="flex items-center gap-4 py-6 border-t border-b border-white/[0.05]">
             <div className="h-12 w-12 rounded-2xl bg-indigo-500 flex items-center justify-center border border-white/20 shadow-lg shadow-indigo-500/20">
                <ShieldCheck className="h-6 w-6 text-white" />
             </div>

@@ -202,17 +202,26 @@ export default function Dashboard() {
       </div>
 
       {/* Top Navigation */}
-      <nav className="sticky top-0 z-50 flex items-center justify-between px-8 py-5 transition-all duration-300">
+      <nav className="sticky top-0 z-50 flex items-start justify-between px-8 py-5 transition-all duration-300">
         {/* Glass Header Wrap */}
         <div className="absolute inset-0 bg-black/40 backdrop-blur-2xl border-b border-white/[0.05]" />
-        
-        <div className="relative flex items-center gap-4">
-          <div className="bg-indigo-500/20 p-2.5 rounded-xl border border-indigo-500/30 shadow-[0_0_20px_rgba(99,102,241,0.1)]">
-            <ShieldAlert className="h-5 w-5 text-indigo-400" />
+
+        <div className="relative flex flex-col">
+          <div className="flex justify-start pb-4">
+            <img
+              src="/KuppiLink.png"
+              alt="KuppiLink"
+              className="h-10 w-auto object-contain"
+            />
           </div>
-          <div className="flex flex-col">
-            <span className="text-lg font-black tracking-tight text-white leading-none uppercase">Smart Campus</span>
-            <span className="text-[10px] font-bold text-white/50 uppercase tracking-[0.3em] mt-1.5">Operations Hub</span>
+          <div className="flex items-center gap-4 pt-4 border-t border-white/[0.05]">
+            <div className="bg-indigo-500/20 p-2.5 rounded-xl border border-indigo-500/30 shadow-[0_0_20px_rgba(99,102,241,0.1)]">
+              <ShieldAlert className="h-5 w-5 text-indigo-400" />
+            </div>
+            <div className="flex flex-col">
+              <span className="text-lg font-black tracking-tight text-white leading-none uppercase">Smart Campus</span>
+              <span className="text-[10px] font-bold text-white/50 uppercase tracking-[0.3em] mt-1.5">Operations Hub</span>
+            </div>
           </div>
         </div>
 
@@ -257,10 +266,10 @@ export default function Dashboard() {
                 <span className="text-[10px] font-black uppercase tracking-[0.3em] text-indigo-300">Campus Status: Optimal</span>
               </div>
               <h1 className="text-5xl lg:text-7xl font-black text-white tracking-tighter leading-[0.9]">
-                Ready for business, <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-white to-purple-400">{user.displayName.split(" ")[0]}?</span>
+                Welcome back, <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-white to-purple-400">{user.displayName.split(" ")[0]}.</span>
               </h1>
               <p className="text-xl text-white/60 max-w-lg leading-relaxed font-medium">
-                Monitor campus operations, manage key facilities, and handle incidents through your unified operations hub.
+                Browse campus facilities, make reservations, and stay updated on everything happening around your campus.
               </p>
             </div>
             <div className="hidden lg:block relative">
