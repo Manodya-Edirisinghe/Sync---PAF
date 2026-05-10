@@ -10,7 +10,6 @@ node_modules/
 
 ## IDE/editor files
 .idea/
-.vscode/
 *.iml
 *.swp
 *.swo
@@ -24,8 +23,6 @@ Thumbs.db
 logs/
 
 ## Environment files
-.env
-.env.*
 !.env.example
 !.env.*.example
 !**/.env.example
