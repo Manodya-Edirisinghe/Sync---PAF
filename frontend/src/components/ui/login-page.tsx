@@ -63,7 +63,12 @@ export function DemoPage({ onLoginSuccess }: DemoPageProps) {
     <div className="dark grid min-h-svh lg:grid-cols-2 text-foreground">
       {/* Left panel — dark background via CSS variables */}
       <div className="bg-background flex flex-col gap-4 p-6 md:p-10">
-        <div className="flex justify-center md:justify-start">
+        <div className="flex flex-col items-center md:items-start gap-3">
+          <img
+            src="/KuppiLink.png"
+            alt="KuppiLink"
+            className="h-10 w-auto object-contain"
+          />
           <h2 className="text-lg font-semibold tracking-wide text-foreground">
             Smart Campus Operations Hub
           </h2>
